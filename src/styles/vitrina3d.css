@@ -1,0 +1,63 @@
+/* ==========================================================
+   Vitrina WebGL: el canvas queda fijo en pantalla (sticky) mientras la cámara
+   recorre el mueble. Encima, una capa HTML con nombres, precios y disponibilidad.
+   ========================================================== */
+
+.v3d { position: relative; margin-block: 8px 24px; }
+.v3d[hidden] { display: none; }
+
+.v3d-escena { position: sticky; overflow: hidden; }
+.v3d-lienzo { display: block; width: 100%; height: 100%; }
+
+.v3d-capa { position: absolute; inset: 0; pointer-events: none; }
+
+/* Cada pieza es un botón que cubre su soporte; la etiqueta de precio cuelga bajo la repisa */
+.v3d-pieza {
+  position: absolute; left: 0; top: 0;
+  padding: 0; border: 0; border-radius: 6px; background: none; font: inherit; color: inherit;
+  pointer-events: auto; cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.v3d-pieza:focus-visible { outline: 2px solid var(--color-accent-indicator); outline-offset: 3px; }
+
+.v3d-etiqueta {
+  position: absolute; top: 100%; left: 50%; transform: translateX(-50%);
+  margin-top: 7px; max-width: 100%;
+  display: flex; flex-direction: column; align-items: center; gap: 1px;
+  padding: 4px 8px 5px; border-radius: 3px;
+  background: rgba(255, 252, 245, 0.9);
+  box-shadow: 0 1px 0 rgba(150, 118, 64, 0.35), 0 4px 10px -6px rgba(58, 46, 34, 0.45);
+  text-align: center; line-height: 1.25;
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.v3d-etiqueta strong {
+  max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  font-size: 12px; font-weight: 400; letter-spacing: 0.3px; color: #3b3126;
+}
+.v3d-precio { font-size: 12px; color: #6f5a3a; }
+.v3d-disp { font-size: 9px; letter-spacing: 1.4px; text-transform: uppercase; color: #8a7a5e; }
+.v3d-disp.apartado { color: #8f4a1e; }
+@media (hover: hover) and (pointer: fine) {
+  .v3d-pieza:hover .v3d-etiqueta { transform: translateX(-50%) translateY(-2px); }
+}
+
+/* Título de cada nivel sobre la banda de latón */
+.v3d-nivel {
+  position: absolute; left: 0; top: 0; margin: 0;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  font-size: 11px; font-weight: 400; letter-spacing: 2.2px; text-transform: uppercase; color: #3f3324;
+}
+.v3d-nivel span { margin-left: 10px; font-size: 11px; letter-spacing: 0.6px; text-transform: none; color: #5e4f39; }
+
+@media (max-width: 899px) {
+  .v3d-etiqueta { margin-top: 5px; padding: 3px 5px 4px; }
+  .v3d-etiqueta strong, .v3d-precio { font-size: 10px; letter-spacing: 0; }
+  .v3d-disp { display: none; }
+  .v3d-disp.apartado { display: block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 8px; letter-spacing: 0.6px; }
+  .v3d-nivel { font-size: 9px; letter-spacing: 1.4px; }
+  .v3d-nivel span { display: block; margin: 2px 0 0; font-size: 9px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .v3d-etiqueta { transition: none; }
+}

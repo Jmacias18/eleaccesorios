@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#fdfbf7" />
+<meta name="color-scheme" content="light" />
+<link rel="icon" type="image/png" href="/favicon.png" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+<meta property="og:title" content="Ele Accesorios" />
+<meta property="og:description" content="Accesorios de joyería en San Luis Río Colorado, Sonora. Pide por WhatsApp." />
+<title>Ele Accesorios | Joyería en San Luis Río Colorado</title>
+<meta name="description" content="Accesorios de joyería en San Luis Río Colorado, Sonora. Revisa el catálogo y pide por WhatsApp." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jost:wght@400&display=swap" />
+<link rel="preload" as="image" href="/portada-pulseras.jpg" media="(min-width: 900px)" />
+<link rel="stylesheet" href="/src/styles/tokens.css" />
+<link rel="stylesheet" href="/src/styles/base.css" />
+<link rel="stylesheet" href="/src/styles/tienda.css" />
+<script>document.documentElement.classList.add("js");</script>
+</head>
+<body>
+
+<!-- Íconos de trazo fino (genéricos) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-wa" viewBox="0 0 24 24"><path d="M4 20l1.3-3.9A8 8 0 1 1 8 19z"/><path d="M9 9.5c0 3 2.5 5.5 5.5 5.5l1-1.5-2-1-1 1a4 4 0 0 1-2-2l1-1-1-2z"/></symbol>
+  <symbol id="i-ig" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r=".6"/></symbol>
+  <symbol id="i-tel" viewBox="0 0 24 24"><path d="M5 4h4l1.5 4-2 1.5a11 11 0 0 0 6 6l1.5-2 4 1.5v4a2 2 0 0 1-2 2A17 17 0 0 1 3 6a2 2 0 0 1 2-2z"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-12a7 7 0 0 1 14 0c0 5.8-7 12-7 12z"/><circle cx="12" cy="9" r="2.5"/></symbol>
+  <symbol id="i-flecha" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+  <symbol id="i-vitrina" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="1.5"/><path d="M4 9h16M4 15h16"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/></symbol>
+</svg>
+
+<div class="aviso-barra">Acero inoxidable y oro laminado · San Luis Río Colorado</div>
+
+<header class="cabecera" id="cabecera">
+  <div class="container cab-fila">
+    <nav class="cab-nav" aria-label="Principal">
+      <ul class="nav-links">
+        <li><a href="#colecciones" data-seccion="colecciones">Colecciones</a></li>
+        <li><a href="#tienda" data-seccion="tienda">Catálogo</a></li>
+        <li><a href="#contacto" data-seccion="contacto">Contacto</a></li>
+      </ul>
+    </nav>
+    <a href="#inicio" class="cab-logo" aria-label="Ele Accesorios, inicio"><img src="/logo-marca.png" width="160" height="160" alt="Ele Accesorios" /></a>
+    <div class="cab-acciones">
+      <a class="cab-icono" href="https://www.instagram.com/ele_acces" target="_blank" rel="noopener" aria-label="Instagram de Ele Accesorios"><svg class="ico" aria-hidden="true"><use href="#i-ig"/></svg></a>
+      <a href="#" class="btn btn-tinta btn-sm" data-wa="Hola, quiero información sobre sus accesorios." aria-label="Pedir por WhatsApp"><svg class="ico" aria-hidden="true"><use href="#i-wa"/></svg><span class="btn-texto">WhatsApp</span></a>
+    </div>
+  </div>
+</header>
+
+<main id="inicio">
+
+  <!-- PORTADA: texto editorial y fotografía real de piezas de la tienda -->
+  <section class="portada" aria-labelledby="portada-titulo">
+    <div class="container portada-grid">
+      <div class="portada-texto">
+        <span class="marca entra" style="--d:0">Ele Accesorios</span>
+        <span class="eyebrow entra" style="--d:1">Joyería · San Luis Río Colorado</span>
+        <h1 id="portada-titulo" class="entra" style="--d:2">Accesorios de joyería<span class="acento">en un solo lugar</span></h1>
+        <p class="lead entra" style="--d:3">Acero inoxidable y oro laminado. Relojes, aretes, collares, pulseras y anillos.</p>
+        <div class="cta-row entra" style="--d:4">
+          <a href="#tienda" class="btn btn-tinta">Ver la vitrina <svg class="ico" aria-hidden="true"><use href="#i-flecha"/></svg></a>
+          <a href="#" class="btn btn-linea" data-wa="Hola, quiero información de sus accesorios."><svg class="ico" aria-hidden="true"><use href="#i-wa"/></svg>Pedir por WhatsApp</a>
+        </div>
+        <dl class="stats entra" style="--d:5">
+          <div class="stat"><dt>Secciones</dt><dd>3</dd></div>
+          <div class="stat"><dt>Materiales</dt><dd>2</dd></div>
+          <div class="stat"><dt>Precios en pesos</dt><dd>MXN</dd></div>
+        </dl>
+      </div>
+      <figure class="portada-foto entra" style="--d:1">
+        <picture>
+          <source media="(max-width: 899px)" srcset="/portada-pulseras-700.jpg" />
+          <img src="/portada-pulseras.jpg" width="1200" height="1600" fetchpriority="high"
+               alt="Pulseras de corazones con cristales de colores sobre un exhibidor de terciopelo" />
+        </picture>
+        <span class="portada-sello" aria-hidden="true"><img src="/logo-512.png" width="96" height="96" alt="" /></span>
+      </figure>
+    </div>
+  </section>
+
+  <!-- COLECCIONES: atajos a cada sección del catálogo (las arma el script con las secciones reales) -->
+  <section id="colecciones" class="seccion colecciones" aria-labelledby="colecciones-titulo">
+    <div class="container">
+      <div class="seccion-cab">
+        <span class="eyebrow" data-revelar>Colecciones</span>
+        <h2 id="colecciones-titulo" data-revelar style="--i:1">Elige una sección</h2>
+      </div>
+      <div class="colecciones-grid" id="colecciones-grid"></div>
+    </div>
+  </section>
+
+  <!-- CATÁLOGO: la vitrina es la protagonista -->
+  <section id="tienda" class="seccion sala" aria-labelledby="tienda-titulo">
+    <div class="container">
+      <div class="seccion-cab centrada">
+        <span class="eyebrow" data-revelar>Tienda</span>
+        <h2 id="tienda-titulo" data-revelar style="--i:1">Catálogo</h2>
+        <p class="lead" data-revelar style="--i:2">Acércate a una pieza para ver su precio y disponibilidad. Toca para pedirla por WhatsApp.</p>
+      </div>
+
+      <div class="filtros-barra">
+        <div class="filters filters-sec" id="filters" role="group" aria-label="Filtrar por sección"></div>
+        <div class="filters filters-sub" id="filters-sub" role="group" aria-label="Filtrar por categoría" hidden></div>
+      </div>
+
+      <div class="products" id="products" aria-live="polite" aria-busy="true">
+        <div class="esqueleto-vitrina" aria-hidden="true"></div>
+      </div>
+
+      <div class="empty" id="empty" hidden>
+        <strong id="empty-titulo">Por ahora no hay piezas en esta categoría</strong>
+        <p id="empty-texto">Llegan piezas seguido. Dinos qué buscas y te avisamos.</p>
+        <a href="#" class="btn btn-ghost btn-sm" data-wa="Hola, estoy buscando una pieza. ¿Me avisan cuando tengan?">Preguntar por WhatsApp</a>
+      </div>
+
+      <p class="note" data-revelar>Precios en pesos mexicanos (MXN). Si una pieza dice "Consultar precio", escríbenos.</p>
+    </div>
+  </section>
+
+  <!-- CONTACTO -->
+  <section id="contacto" class="seccion contacto" aria-labelledby="contacto-titulo">
+    <div class="container">
+      <div class="seccion-cab">
+        <span class="eyebrow" data-revelar>Contacto</span>
+        <h2 id="contacto-titulo" data-revelar style="--i:1">Platiquemos</h2>
+        <p class="lead" data-revelar style="--i:2">San Luis Río Colorado, Sonora.</p>
+      </div>
+
+      <div class="contact-grid">
+        <a href="#" class="contact-item" data-revelar style="--i:0" data-wa="Hola, quiero información.">
+          <svg class="ico" aria-hidden="true"><use href="#i-wa"/></svg><small>WhatsApp</small><strong>653 112 1568</strong>
+        </a>
+        <a href="tel:+526531121568" class="contact-item" data-revelar style="--i:1">
+          <svg class="ico" aria-hidden="true"><use href="#i-tel"/></svg><small>Teléfono</small><strong>653 112 1568</strong>
+        </a>
+        <a href="https://www.instagram.com/ele_acces" target="_blank" rel="noopener" class="contact-item" data-revelar style="--i:2">
+          <svg class="ico" aria-hidden="true"><use href="#i-ig"/></svg><small>Instagram</small><strong>@ele_acces</strong>
+        </a>
+        <div class="contact-item" data-revelar style="--i:3">
+          <svg class="ico" aria-hidden="true"><use href="#i-pin"/></svg><small>Ubicación</small><strong>San Luis Río Colorado</strong>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- Barra inferior en celular (estilo app): acceso rápido -->
+<nav class="tabbar" aria-label="Acceso rápido">
+  <a href="#tienda" data-seccion="tienda"><svg class="ico" aria-hidden="true"><use href="#i-vitrina"/></svg>Catálogo</a>
+  <a href="#contacto" data-seccion="contacto"><svg class="ico" aria-hidden="true"><use href="#i-chat"/></svg>Contacto</a>
+  <a href="https://www.instagram.com/ele_acces" target="_blank" rel="noopener"><svg class="ico" aria-hidden="true"><use href="#i-ig"/></svg>Instagram</a>
+  <a href="#" data-wa="Hola, quiero información sobre sus accesorios."><svg class="ico" aria-hidden="true"><use href="#i-wa"/></svg>WhatsApp</a>
+</nav>
+
+<footer class="pie">
+  <div class="container">
+    <div class="pie-grid">
+      <div class="pie-marca">
+        <img src="/logo-512.png" width="72" height="72" alt="Ele Accesorios" loading="lazy" />
+        <p>Acero inoxidable y oro laminado · San Luis Río Colorado, Sonora.</p>
+      </div>
+      <div>
+        <h2>Tienda</h2>
+        <ul>
+          <li><a href="#colecciones">Colecciones</a></li>
+          <li><a href="#tienda">Catálogo</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>Síguenos</h2>
+        <ul>
+          <li><a href="https://www.instagram.com/ele_acces" target="_blank" rel="noopener"><svg class="ico" aria-hidden="true"><use href="#i-ig"/></svg>@ele_acces</a></li>
+        </ul>
+      </div>
+      <div>
+        <h2>Contacto</h2>
+        <ul>
+          <li><a href="#" data-wa="Hola, quiero información sobre sus accesorios."><svg class="ico" aria-hidden="true"><use href="#i-wa"/></svg>WhatsApp</a></li>
+          <li><span><svg class="ico" aria-hidden="true"><use href="#i-pin"/></svg>San Luis Río Colorado</span></li>
+        </ul>
+      </div>
+    </div>
+    <p class="pie-legal"><span>© <span id="year"></span> Ele Accesorios</span><span>Precios en pesos mexicanos (MXN)</span></p>
+  </div>
+</footer>
+
+<script type="module">
+import { supabase, configurado } from "/src/supabase.js";
+import { SECCIONES, subcategoriasDe, esc } from "/src/catalogo.js";
+import { montarVitrina } from "/src/vitrina.js";
+import "/src/styles/vitrina.css";
+
+/* ==========================================================
+   CONFIGURACIÓN
+   ========================================================== */
+const WHATSAPP_NUMBER = "526531121568"; // México (52) + lada 653 + 112 1568
+
+/*
+  Las piezas se administran en /admin y se leen de Supabase (tabla "equipos").
+  Las reglas de seguridad (RLS) ya ocultan las vendidas al público.
+*/
+let EQUIPOS = [];
+let seccionActiva = "todos";   // "todos" o id de SECCIONES
+let subActiva = "todos";       // "todos" o id de la subcategoría dentro de la sección
+
+/* ==========================================================
+   LÓGICA
+   ========================================================== */
+
+function waLink(msg) {
+  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
+}
+
+async function cargarEquipos() {
+  // Catálogo de prueba: solo en desarrollo, con ?prueba=1 (este bloque no entra al build de producción)
+  if (import.meta.env.DEV && new URLSearchParams(location.search).has("prueba")) {
+    EQUIPOS = (await import("/src/catalogo-prueba.js")).PIEZAS_PRUEBA;
+    renderProducts();
+    return;
+  }
+  if (!configurado) return mostrarError();
+  const { data, error } = await supabase
+    .from("equipos")
+    .select("id, nombre, seccion, categoria, descripcion, precio, desde, condicion, estado, foto_url")
+    .neq("estado", "vendido")
+    .order("creado_en", { ascending: false });
+  if (error) {
+    console.error("No se pudo cargar el catálogo", error);
+    return mostrarError();
+  }
+  EQUIPOS = data;
+  renderProducts();
+}
+
+function mostrarError() {
+  const list = document.getElementById("products");
+  list.innerHTML = "";
+  list.setAttribute("aria-busy", "false");
+  document.getElementById("empty-titulo").textContent = "No pudimos cargar el catálogo";
+  document.getElementById("empty-texto").textContent = "Revisa tu conexión o escríbenos y te decimos qué piezas hay disponibles.";
+  document.getElementById("empty").hidden = false;
+}
+
+function botonFiltro(texto, activo, alElegir) {
+  const b = document.createElement("button");
+  b.type = "button";
+  b.className = "filter";
+  b.setAttribute("aria-pressed", activo);
+  b.textContent = texto;
+  b.onclick = alElegir;
+  return b;
+}
+
+// Primera fila: sección. Segunda fila (solo con una sección elegida): subcategoría.
+function renderFilters() {
+  const box = document.getElementById("filters");
+  box.innerHTML = "";
+  [{ id: "todos", label: "Todos" }, ...SECCIONES].forEach(s =>
+    box.appendChild(botonFiltro(s.label, s.id === seccionActiva, () => elegirSeccion(s.id))));
+
+  const sub = document.getElementById("filters-sub");
+  sub.innerHTML = "";
+  sub.hidden = seccionActiva === "todos";
+  if (sub.hidden) return;
+  [{ id: "todos", label: "Todas" }, ...subcategoriasDe(seccionActiva)].forEach(c =>
+    sub.appendChild(botonFiltro(c.label, c.id === subActiva, () => elegirSub(c.id))));
+}
+
+// Colecciones: una tarjeta por sección real, con sus subcategorías y cuántas piezas hay
+function renderColecciones() {
+  const grid = document.getElementById("colecciones-grid");
+  grid.innerHTML = "";
+  SECCIONES.forEach((s, i) => {
+    const n = EQUIPOS.filter(p => p.seccion === s.id).length;
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "coleccion";
+    b.setAttribute("aria-pressed", s.id === seccionActiva);
+    b.innerHTML = `
+      <span class="coleccion-num">${String(i + 1).padStart(2, "0")}</span>
+      <h3>${esc(s.label)}</h3>
+      <ul class="coleccion-subs">${subcategoriasDe(s.id).map(c => `<li>${esc(c.label)}</li>`).join("")}</ul>
+      <span class="coleccion-pie">
+        <span class="coleccion-cuenta">${n ? `${n} pieza${n === 1 ? "" : "s"}` : "Próximamente"}</span>
+        <span class="coleccion-ir">Ver <svg class="ico" aria-hidden="true"><use href="#i-flecha"/></svg></span>
+      </span>`;
+    b.setAttribute("aria-label", `${s.label}: ${n} pieza${n === 1 ? "" : "s"}. Ver en el catálogo`);
+    b.onclick = () => {
+      elegirSeccion(s.id);
+      document.getElementById("tienda").scrollIntoView();
+    };
+    grid.appendChild(b);
+  });
+}
+
+function elegirSeccion(id) {
+  seccionActiva = id;
+  subActiva = "todos";
+  renderProducts();
+}
+
+function elegirSub(id) {
+  subActiva = id;
+  renderProducts();
+}
+
+function renderProducts() {
+  renderFilters();
+  renderColecciones();
+  const list = document.getElementById("products");
+  const empty = document.getElementById("empty");
+  list.setAttribute("aria-busy", "false");
+  const items = EQUIPOS.filter(p =>
+    (seccionActiva === "todos" || p.seccion === seccionActiva) &&
+    (subActiva === "todos" || p.categoria === subActiva));
+  document.getElementById("empty-titulo").textContent = EQUIPOS.length
+    ? "Por ahora no hay piezas en esta categoría"
+    : "Estamos renovando el catálogo";
+  document.getElementById("empty-texto").textContent = "Llegan piezas seguido. Dinos qué buscas y te avisamos.";
+  empty.hidden = items.length > 0;
+  montarVitrina(list, items, waLink);
+}
+
+/* ==========================================================
+   REVELADO, NAVEGACIÓN ACTIVA Y ENLACES DE WHATSAPP
+   ========================================================== */
+const observador = "IntersectionObserver" in window
+  ? new IntersectionObserver(entradas => {
+      entradas.forEach(e => {
+        if (!e.isIntersecting) return;
+        e.target.classList.add("visible");
+        observador.unobserve(e.target);
+      });
+    }, { rootMargin: "0px 0px -8% 0px", threshold: 0.12 })
+  : null;
+
+function revelar(el) {
+  if (!observador) return el.classList.add("visible");
+  observador.observe(el);
+}
+document.querySelectorAll("[data-revelar]").forEach(revelar);
+
+// Sección visible: subrayado azul en el menú y color en la barra inferior
+const enlacesSeccion = [...document.querySelectorAll("[data-seccion]")];
+const marcarSeccion = new IntersectionObserver(entradas => {
+  entradas.forEach(e => {
+    if (!e.isIntersecting) return;
+    enlacesSeccion.forEach(a => a.setAttribute("aria-current", a.dataset.seccion === e.target.id ? "true" : "false"));
+  });
+}, { rootMargin: "-45% 0px -45% 0px" });
+["colecciones", "tienda", "contacto"].forEach(id => marcarSeccion.observe(document.getElementById(id)));
+
+// Encabezado: se compacta al bajar
+const cabecera = document.getElementById("cabecera");
+const alBajar = () => cabecera.classList.toggle("con-scroll", scrollY > 24);
+addEventListener("scroll", alBajar, { passive: true });
+alBajar();
+
+// Botones y enlaces que abren WhatsApp con mensaje prellenado
+document.querySelectorAll("[data-wa]").forEach(el => {
+  el.href = waLink(el.dataset.wa);
+  el.target = "_blank";
+  el.rel = "noopener";
+});
+
+document.getElementById("year").textContent = new Date().getFullYear();
+cargarEquipos();
+</script>
+</body>
+</html>

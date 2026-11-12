@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content" />
+<meta name="robots" content="noindex, nofollow" />
+<meta name="theme-color" content="#0b0b12" />
+<meta name="color-scheme" content="dark" />
+<title>Panel | Ele Accesorios</title>
+<link rel="icon" type="image/png" href="/favicon.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" />
+<link rel="stylesheet" href="/src/styles/tokens.css" />
+<link rel="stylesheet" href="/src/styles/base.css" />
+<link rel="stylesheet" href="/admin/admin.css" />
+<link rel="stylesheet" href="/src/styles/navegador.css" />
+</head>
+<body>
+
+<!-- Mismo fondo que la tienda, sin movimiento (el panel es una herramienta de uso diario) -->
+<div class="fondo quieto" aria-hidden="true"><span class="aurora a1"></span><span class="aurora a2"></span><span class="aurora a3"></span></div>
+
+<!-- LOGIN -->
+<main id="vista-login" class="login" hidden>
+  <form id="form-login" class="login-card" novalidate>
+    <div class="logo con-marca"><img class="logo-marca" src="/logo-marca.png" width="48" height="48" alt="" /><div>ELE<span>ACCESORIOS</span><small>PANEL DE PIEZAS</small></div></div>
+
+    <label class="campo">
+      <span>Correo</span>
+      <input type="email" name="correo" autocomplete="username" inputmode="email" autocapitalize="none" autocorrect="off" enterkeyhint="next" required />
+    </label>
+
+    <label class="campo">
+      <span>Contraseña</span>
+      <div class="con-boton">
+        <input type="password" name="contrasena" autocomplete="current-password" enterkeyhint="go" required />
+        <button type="button" class="ver" id="ver-contrasena" aria-label="Mostrar contraseña">Ver</button>
+      </div>
+    </label>
+
+    <p class="error" id="error-login" role="alert" hidden></p>
+
+    <button type="submit" class="btn btn-primary btn-bloque" id="btn-entrar">Entrar</button>
+    <a href="/" class="volver">← Volver a la tienda</a>
+  </form>
+</main>
+
+<!-- PANEL -->
+<div id="vista-panel" hidden>
+  <header class="barra">
+    <div class="logo con-marca"><img class="logo-marca" src="/logo-marca.png" width="34" height="34" alt="" /><div>ELE<span>ACCESORIOS</span><small>PANEL</small></div></div>
+    <nav class="barra-acciones" aria-label="Sesión">
+      <a href="/" class="btn btn-ghost btn-sm btn-tienda" target="_blank" rel="noopener" aria-label="Ver tienda (se abre en otra pestaña)"><span data-ico="externo"></span><span class="solo-ancho">Ver tienda</span></a>
+      <button type="button" class="btn btn-ghost btn-sm" id="btn-salir">Salir</button>
+    </nav>
+  </header>
+  <main class="contenedor">
+    <div class="pestanas" role="tablist" aria-label="Secciones del panel">
+      <button type="button" role="tab" id="tab-equipos" data-pestana="equipos" aria-controls="panel-equipos" aria-selected="true">Equipos</button>
+      <button type="button" role="tab" id="tab-proyectos" data-pestana="proyectos" aria-controls="panel-proyectos" aria-selected="false" tabindex="-1">Proyectos</button>
+    </div>
+
+    <section id="panel-equipos" role="tabpanel" aria-labelledby="tab-equipos">
+    <div class="encabezado">
+      <div>
+        <h1>Equipos</h1>
+        <p class="muted" id="resumen" aria-live="polite">Cargando equipos…</p>
+      </div>
+      <button type="button" class="btn btn-primary" id="btn-nuevo"><span data-ico="mas"></span>Nuevo equipo</button>
+    </div>
+
+    <div class="herramientas">
+      <label class="buscador">
+        <span class="sr">Buscar equipos</span>
+        <span class="buscador-ico" data-ico="buscar"></span>
+        <input type="search" id="buscar" placeholder="Buscar por nombre o descripción" autocomplete="off" enterkeyhint="search" />
+      </label>
+      <div class="filtros" id="filtros" role="group" aria-label="Filtrar por estado"></div>
+    </div>
+
+    <ul class="lista" id="lista" aria-busy="true"></ul>
+
+    <div class="vacio" id="vacio" hidden>
+      <strong id="vacio-titulo"></strong>
+      <p class="muted" id="vacio-texto"></p>
+      <button type="button" class="btn btn-ghost btn-sm" id="vacio-accion"></button>
+    </div>
+    </section>
+
+    <section id="panel-proyectos" role="tabpanel" aria-labelledby="tab-proyectos" hidden>
+      <div class="encabezado">
+        <div>
+          <h1>Proyectos</h1>
+          <p class="muted" id="resumen-proyectos" aria-live="polite">Cargando proyectos…</p>
+        </div>
+        <button type="button" class="btn btn-primary" id="btn-nuevo-proyecto"><span data-ico="mas"></span>Nuevo proyecto</button>
+      </div>
+      <p class="ayuda-seccion muted">Aparecen en la página en la sección <b>Proyectos</b>. Los que tienen enlace se abren dentro de la página, sin mostrar la dirección.</p>
+      <ul class="lista" id="lista-proyectos" aria-busy="true"></ul>
+      <div class="vacio" id="vacio-proyectos" hidden>
+        <strong id="vacio-proyectos-titulo"></strong>
+        <p class="muted" id="vacio-proyectos-texto"></p>
+        <button type="button" class="btn btn-ghost btn-sm" id="vacio-proyectos-accion"></button>
+      </div>
+    </section>
+
+    <p class="sesion muted">Sesión: <span id="correo-sesion"></span></p>
+  </main>
+</div>
+
+<!-- FORMULARIO NUEVO / EDITAR -->
+<dialog id="dlg-equipo" class="hoja" aria-labelledby="titulo-form">
+  <form id="form-equipo" novalidate>
+    <header class="hoja-cabecera">
+      <h2 id="titulo-form">Nuevo equipo</h2>
+      <button type="button" class="cerrar" data-cerrar aria-label="Cerrar sin guardar"><span data-ico="cerrar"></span></button>
+    </header>
+
+    <div class="hoja-cuerpo">
+      <div class="foto-campo">
+        <div class="foto-preview" id="foto-preview"></div>
+        <div class="foto-acciones">
+          <label class="btn btn-ghost btn-sm">
+            <input type="file" accept="image/*" id="foto-input" class="sr" />
+            <span id="foto-btn-texto">Agregar foto</span>
+          </label>
+          <button type="button" class="btn-texto" id="foto-quitar" hidden>Quitar foto</button>
+          <small class="muted" id="foto-info">Se comprime automáticamente.</small>
+        </div>
+      </div>
+
+      <div class="campo">
+        <label for="f-nombre">Nombre <abbr title="obligatorio">*</abbr></label>
+        <input id="f-nombre" name="nombre" required maxlength="120" autocomplete="off" enterkeyhint="next" aria-describedby="err-nombre" />
+        <p class="campo-error" id="err-nombre" hidden></p>
+      </div>
+
+      <div class="fila-2">
+        <div class="campo">
+          <label for="sel-seccion">Sección</label>
+          <select name="seccion" id="sel-seccion"></select>
+        </div>
+        <div class="campo">
+          <label for="sel-categoria">Categoría</label>
+          <select name="categoria" id="sel-categoria"></select>
+        </div>
+      </div>
+
+      <div class="campo">
+        <label for="sel-condicion">Condición</label>
+        <select name="condicion" id="sel-condicion"><option value="">Sin especificar</option></select>
+      </div>
+
+      <div class="campo">
+        <label for="f-descripcion">Descripción</label>
+        <textarea id="f-descripcion" name="descripcion" rows="3" maxlength="400" aria-describedby="ayuda-descripcion"></textarea>
+        <p class="campo-ayuda" id="ayuda-descripcion">Corta: lo que el cliente necesita saber (modelo, memoria, estado).</p>
+      </div>
+
+      <fieldset class="campo precio-campo">
+        <legend>Precio (MXN)</legend>
+        <div class="precio-input">
+          <span aria-hidden="true">$</span>
+          <input name="precio" type="number" inputmode="decimal" min="0" step="1" placeholder="4500" aria-label="Precio en pesos" aria-describedby="err-precio" enterkeyhint="done" />
+        </div>
+        <p class="campo-error" id="err-precio" hidden></p>
+        <label class="check"><input type="checkbox" name="consultar" /> <span>Sin precio: mostrar <b>“Consultar precio”</b></span></label>
+        <label class="check"><input type="checkbox" name="desde" /> <span>Mostrar como <b>“desde $…”</b></span></label>
+      </fieldset>
+
+      <div class="campo">
+        <label for="sel-estado">Estado</label>
+        <select name="estado" id="sel-estado" aria-describedby="ayuda-estado"></select>
+        <p class="campo-ayuda" id="ayuda-estado">Los vendidos no se muestran en la tienda.</p>
+      </div>
+
+      <p class="error" id="error-form" role="alert" hidden></p>
+    </div>
+
+    <footer class="hoja-pie">
+      <button type="button" class="btn btn-ghost" data-cerrar>Cancelar</button>
+      <button type="submit" class="btn btn-primary" id="btn-guardar">Guardar</button>
+    </footer>
+  </form>
+</dialog>
+
+<!-- FORMULARIO PROYECTO -->
+<dialog id="dlg-proyecto" class="hoja" aria-labelledby="titulo-proyecto">
+  <form id="form-proyecto" novalidate>
+    <header class="hoja-cabecera">
+      <h2 id="titulo-proyecto">Nuevo proyecto</h2>
+      <button type="button" class="cerrar" data-cerrar aria-label="Cerrar sin guardar"><span data-ico="cerrar"></span></button>
+    </header>
+
+    <div class="hoja-cuerpo">
+      <div class="campo">
+        <span>Captura de portada</span>
+        <div class="captura-preview" id="captura-preview"></div>
+        <div class="captura-acciones">
+          <label class="btn btn-ghost btn-sm">
+            <input type="file" accept="image/*" id="captura-input" class="sr" />
+            <span id="captura-btn-texto">Subir captura</span>
+          </label>
+          <button type="button" class="btn-texto" id="captura-quitar" hidden>Quitar captura</button>
+        </div>
+        <p class="campo-ayuda" id="captura-info">Una captura de la pantalla principal del sitio. Se ve en la tarjeta antes de abrirlo.</p>
+      </div>
+
+      <div class="campo">
+        <span>Capturas de adentro (galería)</span>
+        <ul class="galeria-lista" id="galeria-lista" aria-label="Capturas de la galería"></ul>
+        <div class="captura-acciones">
+          <label class="btn btn-ghost btn-sm">
+            <input type="file" accept="image/*" multiple id="galeria-input" class="sr" />
+            <span>Agregar capturas</span>
+          </label>
+        </div>
+        <p class="campo-ayuda" id="galeria-info">Para sistemas con inicio de sesión: pantallas de adentro que el visitante ve sin entrar. Se muestran en este orden; usa ◀ para adelantar una.</p>
+      </div>
+
+      <div class="campo">
+        <label for="p-nombre">Nombre <abbr title="obligatorio">*</abbr></label>
+        <input id="p-nombre" name="nombre" required maxlength="80" autocomplete="off" enterkeyhint="next" aria-describedby="err-p-nombre" />
+        <p class="campo-error" id="err-p-nombre" hidden></p>
+      </div>
+
+      <div class="campo">
+        <label for="p-tipo">Tipo</label>
+        <select id="p-tipo" name="tipo"></select>
+      </div>
+
+      <div class="campo">
+        <label for="p-descripcion">Descripción</label>
+        <textarea id="p-descripcion" name="descripcion" rows="3" maxlength="300" aria-describedby="ayuda-p-descripcion"></textarea>
+        <p class="campo-ayuda" id="ayuda-p-descripcion">1–2 líneas: qué hace y para quién. Ej. “Sistema de inventario para bodegas”.</p>
+      </div>
+
+      <div class="campo">
+        <label for="p-url">Enlace del sitio</label>
+        <div class="url-fila">
+          <input id="p-url" name="url" type="url" inputmode="url" autocapitalize="none" autocorrect="off" spellcheck="false"
+                 placeholder="https://mi-proyecto.vercel.app" aria-describedby="ayuda-p-url err-p-url" enterkeyhint="next" />
+          <button type="button" class="btn btn-ghost btn-sm" id="btn-probar"><span data-ico="ojo"></span>Probar vista</button>
+        </div>
+        <p class="campo-error" id="err-p-url" hidden></p>
+        <p class="campo-ayuda" id="ayuda-p-url">No se muestra a los visitantes: el sitio se abre dentro de la página. Vacío = solo la captura. Prueba la vista: si queda en blanco, el sitio no permite mostrarse dentro de otra página.</p>
+      </div>
+
+      <div class="fila-2">
+        <div class="campo">
+          <label for="p-orden">Posición</label>
+          <input id="p-orden" name="orden" type="number" inputmode="numeric" step="1" value="0" aria-describedby="ayuda-p-orden" />
+          <p class="campo-ayuda" id="ayuda-p-orden">Menor número = aparece primero.</p>
+        </div>
+        <div class="campo">
+          <span>Visibilidad</span>
+          <label class="check"><input type="checkbox" name="publicado" checked /> <span>Mostrar en la página</span></label>
+        </div>
+      </div>
+
+      <p class="error" id="error-proyecto" role="alert" hidden></p>
+    </div>
+
+    <footer class="hoja-pie">
+      <button type="button" class="btn btn-ghost" data-cerrar>Cancelar</button>
+      <button type="submit" class="btn btn-primary" id="btn-guardar-proyecto">Guardar</button>
+    </footer>
+  </form>
+</dialog>
+
+<!-- CONFIRMAR ELIMINAR -->
+<dialog id="dlg-eliminar" class="alerta" aria-labelledby="titulo-eliminar" aria-describedby="texto-eliminar">
+  <h2 id="titulo-eliminar">¿Eliminar?</h2>
+  <p id="texto-eliminar">Se borrará <b id="eliminar-nombre"></b> y su imagen. No se puede deshacer.</p>
+  <p class="muted" id="eliminar-nota"></p>
+  <div class="alerta-acciones">
+    <button type="button" class="btn btn-ghost" data-cerrar>Cancelar</button>
+    <button type="button" class="btn btn-danger" id="btn-confirmar-eliminar">Eliminar</button>
+  </div>
+</dialog>
+
+<div class="aviso" id="aviso" role="status" aria-live="polite"></div>
+
+<!-- Mensaje si faltan las claves -->
+<main id="vista-config" class="login" hidden>
+  <div class="login-card">
+    <div class="logo">ELE<span>ACCESORIOS</span></div>
+    <p class="error">Falta configurar Supabase. Copia <code>.env.example</code> como <code>.env.local</code>, pega la URL y la anon key, y reinicia <code>npm run dev</code>.</p>
+  </div>
+</main>
+
+<script type="module" src="/admin/main.js"></script>
+</body>
+</html>

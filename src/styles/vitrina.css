@@ -1,0 +1,373 @@
+/* ==========================================================
+   Vitrina de boutique de lujo: mueble de mármol crema con perfiles de latón,
+   repisas gruesas de cristal, paneles de terciopelo champagne, focos cálidos
+   y soportes de terciopelo para las piezas. Solo se animan transform y opacity.
+   ========================================================== */
+
+#products { display: block; }
+
+/* Mientras carga la vitrina WebGL (src/vitrina3d.js) */
+.v3d-cargando {
+  display: grid; place-items: center; min-height: 60vh; margin-block: 8px 24px; border-radius: 10px;
+  background: radial-gradient(ellipse at 50% 30%, #fbf6ec, #efe4cf 70%);
+  font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: #6f5a3a;
+}
+
+/* Tokens propios de la vitrina */
+.vitrina {
+  --marmol: #f9f4ea;
+  --marmol-sombra: #efe5d3;
+  --terciopelo-claro: #fbf6ec;
+  --terciopelo: #efe4cf;
+  --terciopelo-sombra: #d9c8a6;
+  --latón: linear-gradient(90deg, #8a6a33 0%, #e9d08f 22%, #b38a4c 45%, #f8e9bd 62%, #a47c40 82%, #7e5f2c 100%);
+  --oro: #c9a96a;
+  --oro-claro: #efdcae;
+  --cristal: rgba(214, 236, 240, 0.55);
+  --led: #fff0c8;
+  --sombra: rgba(58, 46, 34, 0.32);
+  /* Grano sutil para mármol y terciopelo (textura generada en SVG, sin imágenes) */
+  --grano: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .3  0 0 0 0 .24  0 0 0 0 .16  0 0 0 .12 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+
+  perspective: 1400px;
+  padding: 14px 0 32px;
+}
+
+/* Mueble: mármol crema con marco de latón de 3 px y basamento */
+.marco {
+  position: relative;
+  padding: 26px 26px 16px;
+  border-radius: 10px;
+  border: 3px solid transparent;
+  background:
+    var(--grano),
+    linear-gradient(180deg, #fffdf8 0%, var(--marmol) 45%, var(--marmol-sombra) 100%) padding-box,
+    var(--latón) border-box;
+  transform-style: preserve-3d;
+  transform-origin: 50% 0;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -30px 40px -30px rgba(120, 90, 50, 0.28),
+    0 60px 70px -36px var(--sombra);
+}
+
+/* Cornisa de latón sobre el mueble */
+.marco::before {
+  content: ""; position: absolute; left: -10px; right: -10px; top: -16px; height: 12px; z-index: 3;
+  border-radius: 6px 6px 2px 2px; background: var(--latón);
+  box-shadow: 0 6px 10px -6px var(--sombra);
+}
+
+/* Cristal frontal: reflejo diagonal suave sobre todo el mueble */
+.marco::after {
+  content: ""; position: absolute; inset: 0; border-radius: 8px; pointer-events: none; z-index: 4;
+  background: linear-gradient(118deg, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0) 26%, rgba(255, 255, 255, 0) 74%, rgba(255, 255, 255, 0.18) 100%);
+}
+
+.nivel { position: relative; transform-style: preserve-3d; }
+.nivel + .nivel { margin-top: 34px; }
+
+/* Panel de terciopelo champagne detrás de cada nivel */
+.nivel::before {
+  content: ""; position: absolute; inset: 0 -8px; z-index: 0; pointer-events: none; border-radius: 6px;
+  background:
+    var(--grano),
+    radial-gradient(70% 90% at 50% 0%, var(--terciopelo-claro), var(--terciopelo) 65%, var(--terciopelo-sombra));
+  box-shadow: inset 0 14px 24px -16px rgba(255, 255, 255, 0.8), inset 0 -18px 26px -18px rgba(80, 56, 28, 0.35);
+}
+
+/* Reflejo de cristal sobre el panel: una banda suave, sin líneas */
+.nivel::after {
+  content: ""; position: absolute; inset: 0 -8px; z-index: 0; pointer-events: none; border-radius: 6px;
+  background: linear-gradient(100deg, transparent 36%, rgba(255, 255, 255, 0.28) 50%, transparent 64%);
+}
+
+.nivel-cab {
+  position: relative; z-index: 1;
+  display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline;
+  gap: 6px 14px; margin-bottom: 14px; padding-inline: 10px;
+}
+.nivel-cab h3 {
+  margin: 0; font-size: 12px; font-weight: 400; letter-spacing: 2px; text-transform: uppercase; color: #5b4a33;
+}
+.nivel-cab .stock { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: #7a6240; }
+
+/* Piezas en cuadrícula: el número de columnas lo calcula vitrina.js (--cols) */
+.nivel-piezas {
+  position: relative; z-index: 1;
+  display: grid; grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr));
+  justify-items: center; align-items: end;
+  gap: 30px 20px; min-height: 260px; padding: 0 12px 10px;
+}
+
+/* Repisa de cristal grueso: borde de latón al frente, cara de cristal y sombra debajo */
+.repisa {
+  position: relative; z-index: 2; height: 16px; margin: 0 -14px; border-radius: 2px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(226, 242, 245, 0.7) 40%, rgba(176, 210, 218, 0.6) 100%);
+  box-shadow: 0 24px 22px -12px var(--sombra), inset 0 1px 0 #ffffff;
+  transform: translateZ(-12px);
+  transform-origin: left center;
+}
+/* Latón del borde superior */
+.repisa::before {
+  content: ""; position: absolute; inset: 0 0 auto; height: 3px; border-radius: 2px 2px 0 0;
+  background: var(--latón);
+}
+/* Grosor del cristal: cara frontal */
+.repisa::after {
+  content: ""; position: absolute; inset-inline: 0; top: 100%; height: 8px;
+  background: linear-gradient(rgba(170, 206, 214, 0.75), rgba(120, 165, 176, 0.7));
+  border-radius: 0 0 3px 3px;
+}
+
+/* LED cálido bajo el borde frontal de la repisa */
+.led {
+  position: absolute; left: 3%; right: 3%; top: calc(100% + 3px); height: 3px; z-index: 3;
+  background: linear-gradient(90deg, transparent, var(--led) 18%, #ffe2a8 50%, var(--led) 82%, transparent);
+  box-shadow: 0 0 12px 3px rgba(255, 220, 160, 0.6);
+  pointer-events: none;
+}
+
+/* Focos dirigidos desde arriba: dos conos cálidos sobre cada nivel */
+.luz {
+  position: absolute; inset: 0 0 auto 0; height: 280px; z-index: 0; pointer-events: none;
+  opacity: 0.1;
+  background:
+    radial-gradient(42% 100% at 22% 0%, rgba(255, 244, 214, 0.75), transparent 72%),
+    radial-gradient(42% 100% at 78% 0%, rgba(255, 244, 214, 0.75), transparent 72%);
+}
+
+/* ----- Pieza ----- */
+.pieza { position: relative; width: 100%; max-width: 200px; transform-style: preserve-3d; }
+
+.pieza-btn {
+  position: relative; display: flex; flex-direction: column; align-items: center; gap: 8px; width: 100%;
+  padding: 0; border: 0; background: transparent; color: #3b3126; font: inherit; cursor: pointer;
+  touch-action: manipulation;
+  transition: transform var(--dur-base) var(--ease-out);
+}
+.pieza-btn:focus-visible { outline: none; }
+.pieza-btn:focus-visible .pieza-img { box-shadow: var(--focus-ring); border-radius: 6px; }
+
+/* Área de exhibición: la pieza descansa sobre su soporte */
+.pieza-img {
+  position: relative; display: flex; align-items: flex-end; justify-content: center;
+  width: 100%; height: 240px;
+}
+/* Brillo cálido que cae sobre la joya al pasar el cursor */
+.pieza-img::before {
+  content: ""; position: absolute; inset: 0 -12% 14%; z-index: 2; pointer-events: none;
+  background: radial-gradient(closest-side, rgba(255, 244, 214, 0.85), rgba(255, 244, 214, 0));
+  mix-blend-mode: soft-light; opacity: 0; transition: opacity var(--dur-base) var(--ease-out);
+}
+.pieza-foto {
+  position: relative; z-index: 1; display: flex; align-items: flex-end; justify-content: center;
+  width: 100%; height: 100%;
+}
+.pieza-foto img {
+  display: block; max-width: 100%; max-height: 100%; width: auto; height: auto;
+  object-fit: contain; object-position: center bottom;
+  filter: drop-shadow(0 10px 8px rgba(40, 28, 16, 0.28));
+  transition: filter var(--dur-base) var(--ease-out);
+}
+.pieza-foto.con-foto { border-radius: 4px; }
+
+/* Sombra de contacto debajo de la foto: la pieza parece apoyada en la repisa */
+.pieza-sombra {
+  position: absolute; left: 12%; right: 12%; bottom: -3px; z-index: 0; height: 18px; pointer-events: none;
+  background: radial-gradient(closest-side, rgba(58, 40, 22, 0.42), rgba(58, 40, 22, 0));
+}
+
+/* Etiqueta de imagen pendiente: la pieza no tiene foto cargada todavía */
+.pieza-pendiente {
+  position: absolute; top: 4px; left: 50%; z-index: 3; transform: translateX(-50%); white-space: nowrap;
+  padding: 3px 9px; border-radius: 20px; border: 1px solid var(--oro-claro);
+  background: rgba(255, 253, 248, 0.92); color: #7a6240;
+  font-size: 9px; letter-spacing: 1.4px; text-transform: uppercase;
+}
+
+/* ----- Soportes de exhibición de terciopelo y mármol (piezas sin foto) ----- */
+.pieza-soporte {
+  position: absolute; bottom: 0; left: 50%; z-index: 0; transform: translateX(-50%);
+  transform-origin: 50% 100%;
+}
+.sin-foto .pieza-soporte { z-index: 1; }
+
+/* Busto de terciopelo (collares): cuello alto con hombros suaves y sombra de contacto */
+.soporte-busto {
+  width: 96px; height: 176px;
+  border-radius: 48px 48px 10px 10px / 60px 60px 10px 10px;
+  background:
+    var(--grano),
+    linear-gradient(90deg, #cdb88f 0%, var(--terciopelo) 28%, #fbf4e6 52%, var(--terciopelo) 78%, #bfa77e 100%);
+  box-shadow: inset -8px 0 14px -10px rgba(60, 40, 20, 0.35), 0 10px 12px -6px var(--sombra);
+}
+.soporte-busto::after {
+  content: ""; position: absolute; left: 50%; bottom: -7px; width: 124px; height: 12px; transform: translateX(-50%);
+  border-radius: 50%; background: linear-gradient(90deg, #b99b62, #f4e4bb 50%, #b99b62);
+  box-shadow: 0 6px 8px -4px var(--sombra);
+}
+
+/* Varilla de latón con base de terciopelo (aretes, arracadas, charms, llaveros) */
+.soporte-exhibidor {
+  width: 96px; height: 176px;
+  background: linear-gradient(90deg, transparent calc(50% - 2px), #c9a96a calc(50% - 2px), #f6e6b6 50%, #b38a4c calc(50% + 2px), transparent calc(50% + 2px));
+}
+.soporte-exhibidor::after {
+  content: ""; position: absolute; left: 50%; bottom: 0; width: 96px; height: 14px; transform: translateX(-50%);
+  border-radius: 7px;
+  background: var(--grano), linear-gradient(90deg, #cdb88f, var(--terciopelo-claro) 45%, #bfa77e);
+  box-shadow: 0 8px 10px -5px var(--sombra), inset 0 2px 0 rgba(255, 255, 255, 0.7);
+}
+
+/* Cojín de terciopelo con ribete de latón (anillos) */
+.soporte-cojin {
+  width: 136px; height: 50px; border-radius: 50%;
+  background:
+    var(--grano),
+    radial-gradient(60% 120% at 50% 0%, #fffaf0, var(--terciopelo) 70%, var(--terciopelo-sombra));
+  box-shadow: 0 10px 12px -6px var(--sombra), inset 0 -3px 0 #c9a96a;
+}
+
+/* Cilindro de terciopelo (pulseras y brazaletes) con tapa elíptica */
+.soporte-cilindro {
+  width: 140px; height: 88px; border-radius: 50% / 16%;
+  background:
+    var(--grano),
+    linear-gradient(90deg, #c4ac7e 0%, #f2e4c4 30%, var(--terciopelo-claro) 50%, var(--terciopelo) 75%, #b89a62 100%);
+  box-shadow: 0 10px 12px -6px var(--sombra);
+}
+.soporte-cilindro::before {
+  content: ""; position: absolute; left: 0; right: 0; top: -10px; height: 20px; border-radius: 50%;
+  background: radial-gradient(closest-side, #fffdf7, #eadcbc 80%);
+  border: 1px solid #d6bd85;
+}
+
+/* Pedestal de mármol con borde de latón (relojes, bolsas y otros) */
+.soporte-base {
+  width: 132px; height: 64px;
+  clip-path: polygon(6% 0, 94% 0, 100% 100%, 0 100%);
+  background:
+    var(--grano),
+    linear-gradient(90deg, #e8dfcd, #fffdf8 50%, #d8ccb6);
+  box-shadow: 0 10px 12px -6px var(--sombra);
+}
+.soporte-base::before {
+  content: ""; position: absolute; left: 0; right: 0; top: 0; height: 3px; background: var(--latón);
+}
+
+.pieza-nombre {
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+  width: 100%; text-align: center; margin-top: 2px;
+  font-size: 11px; line-height: 1.3; letter-spacing: 1.2px; text-transform: uppercase;
+}
+
+/* Ficha al pasar el cursor o enfocar: nombre, precio y disponibilidad */
+.pieza-ficha {
+  position: absolute; left: 50%; bottom: calc(100% + 8px); z-index: 5;
+  width: 200px; padding: 10px 12px; border: 1px solid var(--oro); border-radius: 6px;
+  background: #fffdf8; color: #3b3126;
+  box-shadow: 0 16px 28px -12px var(--sombra);
+  display: flex; flex-direction: column; gap: 4px;
+  opacity: 0; pointer-events: none;
+  transform: translateX(-50%) translateY(6px);
+  transition: opacity var(--dur-fast) var(--ease-out), transform var(--dur-fast) var(--ease-out);
+}
+.pieza-ficha strong { font-weight: 400; font-size: 11px; letter-spacing: 1.2px; text-transform: uppercase; }
+.pieza-ficha-precio { font-size: 13px; color: #6f5a3a; }
+.pieza-ficha-disp { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gris-texto); }
+.pieza-ficha-disp.apartado { color: var(--rojo-700); }
+
+/* Interacción: la pieza se eleva, recibe luz y las fotos brillan con el metal */
+@media (hover: hover) and (pointer: fine) {
+  .pieza:hover .pieza-btn { transform: translateY(-10px) scale(1.05); }
+  .pieza:hover .pieza-img::before { opacity: 1; }
+  .pieza:hover .pieza-foto img { filter: drop-shadow(0 18px 14px rgba(40, 28, 16, 0.32)) brightness(1.05) saturate(1.04); }
+}
+.pieza:hover .pieza-ficha,
+.pieza:focus-within .pieza-ficha { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ----- Detalle del producto ----- */
+/* Ficha de boutique: foto protagonista sobre terciopelo, datos a la derecha.
+   Va fuera de .vitrina (se agrega a <body>), así que define sus propios materiales. */
+dialog.detalle {
+  --terciopelo: #efe4cf;
+  --oro: #c9a96a;
+  position: fixed; inset: 0; margin: auto; height: fit-content;
+  width: min(880px, 94vw); max-height: 90vh; overflow: auto; padding: 0;
+  border: 1px solid rgba(122, 92, 43, 0.25); border-radius: 22px;
+  background: #fffdf8; color: #2a241c;
+  box-shadow: 0 2px 6px rgba(58, 46, 34, 0.08), 0 40px 80px -30px rgba(58, 46, 34, 0.5);
+}
+dialog.detalle::backdrop { background: rgba(42, 34, 24, 0.5); backdrop-filter: blur(4px); }
+dialog.detalle[open] { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); animation: detalle-entra 420ms cubic-bezier(0.23, 1, 0.32, 1); }
+dialog.detalle[open]::backdrop { animation: detalle-velo 300ms ease; }
+@keyframes detalle-entra { from { opacity: 0; transform: translateY(16px) scale(0.98); } to { opacity: 1; transform: none; } }
+@keyframes detalle-velo { from { opacity: 0; } to { opacity: 1; } }
+.detalle-foto {
+  position: relative; display: flex; align-items: center; justify-content: center;
+  min-height: 420px; overflow: hidden;
+  background:
+    radial-gradient(60% 50% at 50% 30%, rgba(255, 244, 222, 0.95), transparent 70%),
+    radial-gradient(80% 80% at 50% 60%, #f7efe0, var(--terciopelo));
+}
+.detalle-foto::after { content: ""; position: absolute; inset: auto 0 0; height: 2px; background: linear-gradient(90deg, transparent, var(--oro), transparent); }
+.detalle-foto.con-foto img { width: 100%; height: 100%; max-height: 90vh; object-fit: cover; }
+.detalle-foto .pieza-soporte { position: relative; left: auto; bottom: auto; transform: scale(1.6); margin: 0 0 40px; }
+.detalle-foto .pieza-pendiente { top: 14px; }
+.detalle-texto { display: flex; flex-direction: column; gap: 14px; padding: 44px 36px 32px; }
+.detalle-texto .micro { font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: #655d50; }
+.detalle-texto h2 { margin: 0; font-size: clamp(22px, 2.4vw, 28px); font-weight: 400; line-height: 1.15; letter-spacing: 0.04em; text-transform: none; }
+.detalle-precio {
+  margin: 4px 0 0; padding-bottom: 16px; border-bottom: 1px solid rgba(122, 92, 43, 0.18);
+  font-size: 26px; letter-spacing: 0.02em; color: #7a5c2b; font-variant-numeric: tabular-nums;
+}
+.detalle-disp { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0; font-size: 13px; color: #655d50; }
+.detalle-chip {
+  display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 999px;
+  font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+  background: #e8f1ea; color: #2f6f4a;
+}
+.detalle-chip::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.detalle-chip.apartado { background: #f6e9df; color: #8f4a1e; }
+.detalle-desc { margin: 0; font-size: 14px; line-height: 1.7; color: #4a4339; }
+.detalle-acciones { margin-top: auto; padding-top: 12px; display: grid; gap: 10px; }
+.detalle-acciones .btn { width: 100%; }
+.detalle-nota { margin: 0; font-size: 12px; line-height: 1.5; color: #655d50; text-align: center; }
+.detalle-cerrar {
+  position: absolute; top: 12px; right: 12px; width: 44px; height: 44px; border: 0; border-radius: 50%;
+  background: rgba(255, 253, 248, 0.92); color: #2a241c; font-size: 22px; line-height: 1; cursor: pointer; z-index: 5;
+  box-shadow: 0 4px 14px -6px rgba(58, 46, 34, 0.4);
+}
+@media (prefers-reduced-motion: reduce) {
+  dialog.detalle[open], dialog.detalle[open]::backdrop { animation: none; }
+}
+
+/* ----- Celular: el mueble queda plano y las piezas se acomodan en filas equilibradas ----- */
+@media (max-width: 899px) {
+  /* La vitrina usa casi todo el ancho (16 px de margen) para que quepan tres piezas por fila */
+  #products { margin-inline: -18px; }
+  .vitrina { perspective: none; padding: 12px 0 24px; }
+  .marco { transform: none; padding: 16px 6px 8px; }
+  .marco::before { left: -6px; right: -6px; }
+  .pieza { max-width: 150px; }
+  .pieza-img { height: 160px; }
+  .pieza-pendiente { font-size: 8px; letter-spacing: 1px; padding: 2px 6px; }
+  .repisa { margin: 0 -6px; }
+  .nivel::before, .nivel::after { inset: 0 -6px; }
+  .nivel-piezas { gap: 22px 8px; min-height: 0; padding: 0 2px 8px; }
+  .pieza-soporte { transform: translateX(-50%) scale(0.72); }
+  .luz { height: 180px; }
+  .pieza-ficha { display: none; } /* en celular no hay hover: el toque abre el detalle */
+  /* En celular la ficha sube desde abajo, como hoja */
+  dialog.detalle { inset: auto 0 0; width: 100%; max-width: none; max-height: 92vh; margin: 0; border-radius: 22px 22px 0 0; }
+  dialog.detalle[open] { grid-template-columns: 1fr; animation-name: detalle-sube; }
+  @keyframes detalle-sube { from { transform: translateY(40px); opacity: 0; } to { transform: none; opacity: 1; } }
+  .detalle-foto { min-height: 300px; max-height: 52vh; }
+  .detalle-texto { padding: 24px 20px calc(24px + env(safe-area-inset-bottom)); gap: 12px; }
+  .detalle-precio { font-size: 22px; padding-bottom: 12px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pieza-btn, .pieza-ficha, .pieza-img::before { transition: none; }
+}

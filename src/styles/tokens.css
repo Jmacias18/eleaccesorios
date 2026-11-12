@@ -1,0 +1,147 @@
+/* ==========================================================
+   Ele Accesorios · Design tokens (sistema acromático, estilo "vitrina")
+   Única fuente de verdad para la tienda (/) y el panel (/admin).
+   Capas: primitivos → semánticos → componentes.
+   Los componentes solo usan semánticos o de componente, nunca primitivos.
+   ========================================================== */
+
+:root {
+  color-scheme: light;
+
+  /* ---------- 1. Primitivos ---------- */
+  --tinta: #212123;        /* tinta cálida casi negra: texto y formas */
+  --blanco: #fefefe;       /* blanco de marca (manual de identidad) */
+  --negro: #000000;        /* estados activos */
+  --gris-ceniza: #999999;  /* bordes inactivos y separadores */
+  --gris-perla: #a6a6a7;   /* decorativo: no usar para texto (contraste insuficiente) */
+  --gris-texto: #6b6b6e;   /* 5.3:1 sobre blanco: texto secundario y precios */
+  --gris-suave: #f4f4f4;   /* fondo de foto de producto */
+  /* Paleta de marca (manual de identidad): #4eace9, #7bc1ef, #fefefe.
+     El azul de marca es solo no textual (indicadores, bordes, foco).
+     Los tonos profundos se derivan del mismo azul para texto y botones con contraste suficiente. */
+  --azul-logo: #4eace9;    /* marca primaria: 2.6:1 con blanco, solo no textual */
+  --azul-secundario: #7bc1ef; /* marca secundaria: fondos suaves y acentos */
+  --azul-profundo: #1a72b5; /* 5.1:1 con blanco: botones y acentos de texto */
+  --azul-tinta: #0f4c7a;   /* 9.2:1 sobre blanco: encabezados azules */
+  --azul-claro: #7bc1ef;   /* fondos de selección (manual: secundario) */
+  --rojo-700: #b42318;     /* único tono funcional: errores y eliminar */
+  --verde-700: #1e7a46;
+
+  /* Materiales de la vitrina (dirección de arte, no reemplazan el azul de marca).
+     Fondos y acentos finos: crema, champagne, mármol y latón; el azul sigue siendo la marca. */
+  --crema-50: #fdfbf7;     /* fondo general cálido */
+  --crema-100: #f8f3ea;    /* bandas suaves */
+  --champagne-200: #efe4cf;/* terciopelo claro */
+  --champagne-400: #c9b38c;/* terciopelo de fondo */
+  --laton-400: #c9a45c;    /* latón: solo filetes y detalles, no texto */
+  --laton-700: #7a5c2b;    /* latón oscuro: 5.6:1 sobre crema, apto para precios */
+  --marmol: #f9f4ea;
+  --sombra-calida: 58, 46, 34; /* RGB para sombras suaves */
+
+  /* ---------- 2. Semánticos ---------- */
+  --color-bg: var(--blanco);
+  --color-bg-alt: var(--blanco);
+  --color-surface: var(--blanco);
+  --color-surface-raised: var(--blanco);
+  --color-border: var(--gris-ceniza);
+  --color-border-strong: var(--tinta);
+
+  --color-text: var(--tinta);
+  --color-text-secondary: var(--tinta);
+  --color-text-muted: var(--gris-texto);
+
+  --color-accent: var(--azul-profundo);
+  --color-accent-hover: #155e96;
+  --color-accent-text: var(--azul-tinta);
+  --color-accent-soft: var(--azul-claro);
+  --color-accent-indicator: var(--azul-logo);
+  --color-on-accent: var(--blanco);
+
+  --color-whatsapp: var(--tinta);   /* sin verde: el CTA es la misma tinta de la marca */
+  --color-on-whatsapp: var(--blanco);
+
+  --color-danger: var(--rojo-700);
+  --color-danger-hover: #8f1b12;
+  --color-danger-text: var(--rojo-700);
+  --color-danger-soft: #fdecea;
+  --color-success-text: var(--verde-700);
+  --color-success-soft: #e6f5ec;
+  --color-warning-text: var(--tinta);
+  --color-warning-soft: var(--gris-suave);
+
+  --focus-ring: 0 0 0 2px var(--blanco), 0 0 0 4px var(--azul-logo);
+
+  /* Tipografía: una sola familia, peso 400. La jerarquía sale de mayúsculas y espaciado. */
+  /* Century Gothic es la tipografía de marca (manual). Si no está instalada, cae a Jost (Google Fonts), de rasgos parecidos. */
+  --font-display: "Century Gothic", "Jost", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-body: "Century Gothic", "Jost", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --text-xs: 0.6875rem;   /* 11 */
+  --text-sm: 0.875rem;    /* 14 */
+  --text-base: 1rem;      /* 16 */
+  --text-lg: 1.125rem;    /* 18: techo de la escala de interfaz */
+  --text-xl: 1.125rem;
+  --text-2xl: 1.125rem;
+  --text-3xl: 1.125rem;
+  --text-4xl: 1.125rem;
+  --leading-tight: 1.2;
+  --leading-body: 1.5;
+  --tracking-tight: 0.02em;
+  --tracking-caps: 0.14em;   /* mayúsculas: 1.5px a 11px */
+  --font-weight-regular: 400;
+
+  /* Espaciado: retícula de 8 (4 para ajustes finos) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
+  --gutter: 34px;
+
+  /* Radios: cartas 8px, botones píldora */
+  --radius-sm: 8px;
+  --radius-md: 8px;
+  --radius-lg: 8px;
+  --radius-xl: 8px;
+  --radius-full: 9999px;
+
+  /* Sin elevación: la superficie plana es parte del lenguaje */
+  --shadow-card: none;
+  --shadow-float: none;
+  --glow-accent: none;
+  --glow-whatsapp: none;
+  --filete-oro: none;
+  --texto-degradado: none;
+
+  /* Movimiento sobrio */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --dur-press: 120ms;
+  --dur-fast: 160ms;
+  --dur-base: 220ms;
+  --dur-revelar: 600ms;
+
+  /* ---------- 3. Componentes ---------- */
+  --control-h: 48px;
+  --control-h-sm: 44px;   /* mínimo tocable */
+  --btn-radius: 50px;
+  --input-radius: var(--radius-md);
+  --input-bg: var(--blanco);
+  --card-bg: var(--blanco);
+  --card-border: transparent;
+  --card-radius: 8px;
+  --card-pad: 0px;
+  --header-bg: var(--blanco);
+  --header-bg-scroll: var(--blanco);
+  --placeholder-bg: var(--gris-suave);
+
+  /* Compatibilidad: efectos eliminados, sin efecto */
+  --superficie-vidrio: linear-gradient(transparent, transparent);
+  --brillo-superior: inset 0 0 0 transparent;
+  --borde-degradado: linear-gradient(transparent, transparent);
+  --ruido: none;
+  --dur-ambiente: 0s;
+}

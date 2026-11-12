@@ -1,0 +1,17 @@
+node_modules/
+dist/
+
+# Claves: nunca commitear
+.env
+.env.*
+!.env.example
+
+.vercel/
+.DS_Store
+
+# Notas locales (no subir)
+CLAUDE.md
+.claude/
+
+# Estado local de Wrangler (no subir)
+.wrangler/
