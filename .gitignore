@@ -15,3 +15,6 @@ CLAUDE.md
 
 # Estado local de Wrangler (no subir)
 .wrangler/
+
+# Skills de agentes instaladas localmente
+.agents/
