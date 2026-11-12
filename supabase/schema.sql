@@ -17,7 +17,7 @@ returns boolean
 language sql
 stable
 as $$
-  select auth.uid() = 'PEGA-AQUI-TU-UID'::uuid
+  select auth.uid() = '0a58c59f-b1ee-4279-b3d2-d4fc520d5cbc'::uuid
 $$;
 
 -- ---------- Tabla ----------

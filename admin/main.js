@@ -3,7 +3,6 @@ import { SECCIONES, CONDICIONES, ESTADOS, subcategoriasDe, seccion, categoria, c
 import * as fotos from "../src/fotos.js";
 import { icono } from "../src/iconos.js";
 import { $, aviso, kb, htmlError, setOcupado, confirmarEliminar } from "./ui.js";
-import { iniciarProyectos } from "./proyectos.js";
 
 // <span data-ico="nombre"> → SVG
 document.querySelectorAll("[data-ico]").forEach(el => (el.outerHTML = icono(el.dataset.ico, `ico ${el.className}`.trim())));
@@ -48,7 +47,6 @@ async function entrarAlPanel(session) {
   $("correo-sesion").textContent = session.user.email;
   mostrar("panel");
   cargarEquipos();
-  iniciarProyectos();
 }
 
 async function iniciar() {
@@ -96,34 +94,7 @@ $("ver-contrasena").addEventListener("click", e => {
 $("btn-salir").addEventListener("click", () => supabase.auth.signOut());
 
 /* ==========================================================
-   Pestañas: Equipos / Proyectos (la elegida se recuerda en la URL: #proyectos)
-   ========================================================== */
-const pestanas = [...document.querySelectorAll("[role=tab]")];
-
-function elegirPestana(id, enfocar = false) {
-  pestanas.forEach(t => {
-    const activa = t.dataset.pestana === id;
-    t.setAttribute("aria-selected", activa);
-    t.tabIndex = activa ? 0 : -1;
-    $(t.getAttribute("aria-controls")).hidden = !activa;
-    if (activa && enfocar) t.focus();
-  });
-  history.replaceState(null, "", id === "equipos" ? location.pathname : "#" + id);
-}
-
-pestanas.forEach((t, i) => {
-  t.addEventListener("click", () => elegirPestana(t.dataset.pestana));
-  t.addEventListener("keydown", e => {
-    const paso = { ArrowRight: 1, ArrowLeft: -1 }[e.key];
-    if (!paso) return;
-    const sig = pestanas[(i + paso + pestanas.length) % pestanas.length];
-    elegirPestana(sig.dataset.pestana, true);
-  });
-});
-elegirPestana(location.hash === "#proyectos" ? "proyectos" : "equipos");
-
-/* ==========================================================
-   Lista de equipos
+   Lista de piezas
    ========================================================== */
 let equipos = [];
 let filtroEstado = "todos";
@@ -151,7 +122,7 @@ function mostrarVacio(titulo, texto, boton, accion) {
 $("vacio-accion").addEventListener("click", () => accionVacio?.());
 
 async function cargarEquipos() {
-  $("resumen").textContent = "Cargando equipos…";
+  $("resumen").textContent = "Cargando piezas…";
   $("vacio").hidden = true;
   $("lista").setAttribute("aria-busy", "true");
   $("lista").innerHTML = ESQUELETO.repeat(4);
@@ -160,7 +131,7 @@ async function cargarEquipos() {
   $("lista").setAttribute("aria-busy", "false");
   if (error) {
     $("lista").innerHTML = "";
-    $("resumen").textContent = "No se pudieron cargar los equipos.";
+    $("resumen").textContent = "No se pudieron cargar las piezas.";
     return mostrarVacio("No se pudo conectar", "Revisa tu conexión a internet e inténtalo de nuevo.", "Reintentar", cargarEquipos);
   }
   equipos = data;
@@ -188,7 +159,7 @@ function render() {
   if (visibles.length) return;
 
   if (!equipos.length) {
-    mostrarVacio("Aún no tienes equipos", "Agrega el primero y aparecerá en la tienda al instante.", "Agregar equipo", () => abrirFormulario());
+    mostrarVacio("Aún no tienes piezas", "Agrega la primera y aparecerá en la tienda al instante.", "Agregar pieza", () => abrirFormulario());
   } else if (q) {
     mostrarVacio(`Sin resultados para “${texto}”`, "Prueba con otra palabra, como la marca o el modelo.", "Limpiar búsqueda", () => {
       $("buscar").value = "";
@@ -197,7 +168,7 @@ function render() {
     });
   } else {
     const est = estado(filtroEstado)?.label.toLowerCase();
-    mostrarVacio(`No hay equipos ${est}s`, "Cuando cambies el estado de un equipo aparecerá aquí.", "Ver todos", () => {
+    mostrarVacio(`No hay piezas ${est}s`, "Cuando cambies el estado de una pieza aparecerá aquí.", "Ver todos", () => {
       filtroEstado = "todos";
       render();
     });
@@ -294,7 +265,7 @@ function pedirEliminar(eq) {
    ========================================================== */
 const dlg = $("dlg-equipo");
 const form = $("form-equipo");
-let editando = null;      // equipo que se edita (null = nuevo)
+let editando = null;      // pieza que se edita (null = nuevo)
 let fotoNueva = null;     // Blob comprimido listo para subir
 let quitarFoto = false;
 let previewUrl = null;
@@ -318,7 +289,7 @@ function abrirFormulario(eq = null) {
   quitarFoto = false;
   form.reset();
   errorForm("");
-  $("titulo-form").textContent = eq ? "Editar equipo" : "Nuevo equipo";
+  $("titulo-form").textContent = eq ? "Editar pieza" : "Nueva pieza";
 
   form.nombre.value = eq?.nombre || "";
   form.seccion.value = eq?.seccion || "mujer";
@@ -411,7 +382,7 @@ form.addEventListener("submit", async e => {
   errorForm("");
 
   const nombre = form.nombre.value.trim();
-  if (!nombre) return errorCampo("nombre", "Escribe el nombre del equipo, por ejemplo “iPhone 12 64 GB”.");
+  if (!nombre) return errorCampo("nombre", "Escribe el nombre de la pieza, por ejemplo “iPhone 12 64 GB”.");
 
   let precio = null;
   if (!form.consultar.checked) {
