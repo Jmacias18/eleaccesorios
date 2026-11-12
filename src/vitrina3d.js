@@ -219,12 +219,13 @@ export function crearVitrina3D(contenedor, { alFallar }) {
   const capa = raiz.querySelector(".v3d-capa");
 
   // ----- Three.js -----
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: "high-performance" });
-  renderer.setPixelRatio(Math.min(devicePixelRatio, alta ? 2 : 1.5));
+  // En celular: sin antialias por hardware, menos píxeles y sin mapa de sombras (las sombras de contacto ya son planos)
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: alta, alpha: true, powerPreference: "high-performance" });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, alta ? 2 : 1.25));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.05;
-  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.enabled = alta;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   const anisotropia = Math.min(8, renderer.capabilities.getMaxAnisotropy());
 
@@ -244,8 +245,8 @@ export function crearVitrina3D(contenedor, { alFallar }) {
   const SOL = 2.4;
   const sol = new THREE.DirectionalLight(0xfff0d8, SOL);
   const solDir = new THREE.Vector3(0.4, 1.5, 2.4).normalize().multiplyScalar(3);
-  sol.castShadow = true;
-  sol.shadow.mapSize.set(alta ? 2048 : 1024, alta ? 2048 : 1024);
+  sol.castShadow = alta;
+  sol.shadow.mapSize.set(2048, 2048);
   sol.shadow.bias = -0.0004;
   sol.shadow.normalBias = 0.015;
   sol.shadow.radius = 6;
@@ -597,21 +598,29 @@ export function crearVitrina3D(contenedor, { alFallar }) {
     sol.position.copy(sol.target.position).add(solDir);
   }
 
+  // Escribe un estilo solo si cambió: tocar width/height cada cuadro obliga al navegador a recalcular el diseño
+  const ultimoEstilo = new WeakMap();
+  function estilo(el, campo, valor) {
+    let previo = ultimoEstilo.get(el);
+    if (!previo) ultimoEstilo.set(el, previo = {});
+    if (previo[campo] !== valor) { previo[campo] = valor; el.style[campo] = valor; }
+  }
+
   function actualizarEtiquetas() {
     const ancho = HUECO * 0.46;
     lugares.forEach(l => {
       const [x0] = aPantalla(l.x - ancho, l.piso, REPISA_Z1);
       const [x1, y1] = aPantalla(l.x + ancho, l.piso - VIDRIO, REPISA_Z1);
       const [, y0] = aPantalla(l.x, l.piso + 0.3, PIEZA_Z);
-      l.boton.style.transform = `translate(${x0.toFixed(1)}px, ${y0.toFixed(1)}px)`;
-      l.boton.style.width = (x1 - x0).toFixed(1) + "px";
-      l.boton.style.height = (y1 - y0).toFixed(1) + "px";
+      estilo(l.boton, "transform", `translate(${x0.toFixed(1)}px, ${y0.toFixed(1)}px)`);
+      estilo(l.boton, "width", (x1 - x0).toFixed(1) + "px");
+      estilo(l.boton, "height", (y1 - y0).toFixed(1) + "px");
     });
     titulos.forEach(t => {
       const [x, y] = aPantalla(-anchoInt / 2 + 0.03, t.y, REPISA_Z1);
       const [x1] = aPantalla(anchoInt / 2 - 0.03, t.y, REPISA_Z1);
-      t.el.style.transform = `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) translateY(-50%)`;
-      t.el.style.maxWidth = (x1 - x).toFixed(1) + "px";
+      estilo(t.el, "transform", `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) translateY(-50%)`);
+      estilo(t.el, "maxWidth", (x1 - x).toFixed(1) + "px");
     });
   }
 
