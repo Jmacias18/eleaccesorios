@@ -8,6 +8,10 @@ import { money, condicion, categoria, seccion, esc } from "./catalogo.js";
 
 gsap.registerPlugin(ScrollTrigger);
 
+// Página de Facebook a la que van los clientes al pedir una pieza.
+// Facebook no prellena el mensaje, así que el cliente escribe qué pieza le interesa.
+const FACEBOOK_URL = "https://www.facebook.com/share/1A7EQFPz1g/?mibextid=wwXIfr";
+
 // Niveles de arriba hacia abajo, según el encargo.
 // Una categoría que no esté en ningún nivel cae en el inferior.
 const NIVELES = [
@@ -122,8 +126,8 @@ function abrirDetalle(p) {
       </p>
       ${p.descripcion ? `<p class="detalle-desc">${esc(p.descripcion)}</p>` : ""}
       <div class="detalle-acciones">
-        <a class="btn btn-tinta" href="${esc(waLinkActual(`Hola, me interesa: ${p.nombre}. ¿Sigue disponible?`))}" target="_blank" rel="noopener">Pedir por WhatsApp</a>
-        <p class="detalle-nota">Te confirmamos la disponibilidad por WhatsApp.</p>
+        <a class="btn btn-tinta" href="${esc(FACEBOOK_URL)}" target="_blank" rel="noopener">Pedir por Facebook</a>
+        <p class="detalle-nota">Escribe el nombre de la pieza y te confirmamos la disponibilidad por Facebook.</p>
       </div>
     </div>`;
   detalle.querySelector(".detalle-cerrar").addEventListener("click", () => detalle.close());
