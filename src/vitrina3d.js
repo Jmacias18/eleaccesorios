@@ -253,7 +253,7 @@ export function crearVitrina3D(contenedor, { alFallar }) {
   escena.add(sol, sol.target);
 
   // Foco que acompaña a la pieza señalada
-  const FOCO = 6;
+  const FOCO = 3;
   const foco = new THREE.SpotLight(0xfff1d6, 0, 1.8, 0.3, 0.75, 1.6);
   escena.add(foco, foco.target);
 
