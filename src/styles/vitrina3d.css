@@ -37,9 +37,6 @@
 .v3d-precio { font-size: 12px; color: #6f5a3a; }
 .v3d-disp { font-size: 9px; letter-spacing: 1.4px; text-transform: uppercase; color: #8a7a5e; }
 .v3d-disp.apartado { color: #8f4a1e; }
-@media (hover: hover) and (pointer: fine) {
-  .v3d-pieza:hover .v3d-etiqueta { transform: translateX(-50%) translateY(-2px); }
-}
 
 /* Título de cada nivel sobre la banda de latón */
 .v3d-nivel {
