@@ -318,7 +318,7 @@ function renderProducts() {
     : "Estamos renovando el catálogo";
   document.getElementById("empty-texto").textContent = "Llegan piezas seguido. Dinos qué buscas y te avisamos.";
   empty.hidden = items.length > 0;
-  montarVitrina(list, items, waLink);
+  montarVitrina(list, items, () => FACEBOOK_URL);
 }
 
 /* ==========================================================
