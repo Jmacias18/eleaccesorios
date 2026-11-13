@@ -1,4 +1,4 @@
-// Vitrina 3D: piezas acomodadas en tres niveles de un mueble de cristal y mármol claro.
+// Vitrina 3D: piezas acomodadas por tipo, una línea por tipo, en un mueble de cristal y mármol claro.
 // Los datos vienen de la tabla "equipos" (o del catálogo de prueba en desarrollo).
 // Cada pieza muestra su foto (foto_url). Si no tiene, se dibuja el soporte de exhibición de su tipo.
 // Nunca inventa piezas ni cantidades: solo dibuja lo que recibe.
@@ -12,17 +12,25 @@ gsap.registerPlugin(ScrollTrigger);
 // Facebook no prellena el mensaje, así que el cliente escribe qué pieza le interesa.
 const FACEBOOK_URL = "https://www.facebook.com/share/1A7EQFPz1g/?mibextid=wwXIfr";
 
-// Niveles de arriba hacia abajo, según el encargo.
-// Una categoría que no esté en ningún nivel cae en el inferior.
+// Niveles de arriba hacia abajo. Cada línea del mueble tiene un solo tipo de pieza.
+// Los niveles sin piezas no se dibujan. Aretes con arracadas y brazaletes con
+// brazaletes italianos comparten línea porque son el mismo tipo de pieza.
 const NIVELES = [
-  { id: "superior", titulo: "Collares y cadenas", categorias: ["collares"] },
-  { id: "medio", titulo: "Aretes y pulseras", categorias: ["aretes", "arracadas", "pulseras", "brazaletes", "brazaletes-italianos", "relojes"] },
-  { id: "inferior", titulo: "Anillos y accesorios", categorias: ["anillos", "charms", "bolsas", "llaveros", "otros"] },
+  { id: "collares", titulo: "Collares", categorias: ["collares"] },
+  { id: "aretes", titulo: "Aretes y arracadas", categorias: ["aretes", "arracadas"] },
+  { id: "pulseras", titulo: "Pulseras", categorias: ["pulseras"] },
+  { id: "brazaletes", titulo: "Brazaletes", categorias: ["brazaletes", "brazaletes-italianos"] },
+  { id: "anillos", titulo: "Anillos", categorias: ["anillos"] },
+  { id: "relojes", titulo: "Relojes", categorias: ["relojes"] },
+  { id: "charms", titulo: "Charms", categorias: ["charms"] },
+  { id: "bolsas", titulo: "Bolsas", categorias: ["bolsas"] },
+  { id: "llaveros", titulo: "Llaveros", categorias: ["llaveros"] },
+  { id: "otros", titulo: "Otros", categorias: ["otros"] },
 ];
 
 // Soporte de exhibición según la categoría (se usa cuando la pieza no tiene foto)
 const SOPORTE = {
-  collares: "busto",
+  collares: "exhibidor",
   aretes: "exhibidor",
   arracadas: "exhibidor",
   anillos: "cojin",
