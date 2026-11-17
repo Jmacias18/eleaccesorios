@@ -382,7 +382,8 @@ export function crearVitrina3D(contenedor, { alFallar }) {
       g.add(atril(0.22, 0.18, p, 0.235, -0.03));
     } else {
       g.add(malla(G.plinto, M.marmol, 0, 0.03, 0));
-      g.add(malla(G.banda, M.laton, 0, 0.057, 0));
+      // Franja de latón un poco abajo del borde: si su tapa coincide con la del plinto (y = 0.06) parpadea (z-fighting)
+      g.add(malla(G.banda, M.laton, 0, 0.051, 0));
       if (p.categoria === "relojes") {
         g.add(malla(G.almohada, M.terciopelo, 0, 0.09, 0.025));
         g.add(atril(0.22, 0.18, p, 0.235, -0.04));

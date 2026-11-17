@@ -50,11 +50,11 @@
   --color-text-secondary: var(--tinta);
   --color-text-muted: var(--gris-texto);
 
-  --color-accent: var(--azul-profundo);
-  --color-accent-hover: #155e96;
-  --color-accent-text: var(--azul-tinta);
-  --color-accent-soft: var(--azul-claro);
-  --color-accent-indicator: var(--azul-logo);
+  --color-accent: var(--tinta);
+  --color-accent-hover: var(--negro);
+  --color-accent-text: var(--tinta);
+  --color-accent-soft: var(--champagne-200);
+  --color-accent-indicator: var(--tinta);
   --color-on-accent: var(--blanco);
 
   --color-whatsapp: var(--tinta);   /* sin verde: el CTA es la misma tinta de la marca */
@@ -69,7 +69,7 @@
   --color-warning-text: var(--tinta);
   --color-warning-soft: var(--gris-suave);
 
-  --focus-ring: 0 0 0 2px var(--blanco), 0 0 0 4px var(--azul-logo);
+  --focus-ring: 0 0 0 2px var(--blanco), 0 0 0 4px var(--tinta);
 
   /* Tipografía: una sola familia, peso 400. La jerarquía sale de mayúsculas y espaciado. */
   /* Century Gothic es la tipografía de marca (manual). Si no está instalada, cae a Jost (Google Fonts), de rasgos parecidos. */

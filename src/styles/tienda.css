@@ -2,12 +2,12 @@
    Tienda pública (/). Se carga después de tokens.css y base.css.
 
    Dirección visual: la boutique alrededor de la vitrina.
-   - Marca (no cambia): logo azul "Ele", azul #4eace9 / #7bc1ef / #fefefe,
-     Century Gothic (Jost como sustituto), peso 400, mayúsculas espaciadas.
+   - Marca: logo negro "Ele", tinta #212123, Century Gothic (Jost como
+     sustituto), peso 400, mayúsculas espaciadas. Sin azul.
    - Atmósfera (tomada de la vitrina): crema, champagne, mármol claro,
      filetes de latón, luz cálida y sombras suaves.
-   - El azul queda para lo que es de marca o interactivo: logo, aviso,
-     filtro activo, foco e indicadores. El latón solo en filetes y precios.
+   - Tinta para lo interactivo (filtro activo, foco, indicadores);
+     latón en filetes, precios y detalles.
    ========================================================== */
 
 :root {
@@ -25,10 +25,10 @@
   --linea-fuerte: rgba(122, 92, 43, 0.4);
   --laton: var(--laton-400);
   --precio: var(--laton-700);
-  --marca: var(--azul-logo);
-  --marca-suave: var(--azul-secundario);
-  --acento: var(--azul-profundo);   /* filtro activo, enlaces activos */
-  --acento-hover: #155e96;
+  --marca: var(--tinta);
+  --marca-suave: #d9c38f;           /* champagne sobre fondo oscuro (pie) */
+  --acento: var(--tinta);           /* filtro activo, enlaces activos */
+  --acento-hover: #000000;
   --disponible: #2f6f4a;
   --apartado: #8f4a1e;
 
@@ -38,7 +38,7 @@
   --color-border: var(--linea-fuerte);
   --color-border-strong: var(--tinta);
   --color-accent: var(--acento);
-  --color-accent-text: var(--azul-tinta);
+  --color-accent-text: var(--tinta);
   --color-on-accent: #ffffff;
   --color-accent-indicator: var(--marca);
   --focus-ring: 0 0 0 2px var(--fondo), 0 0 0 4px var(--marca);
@@ -76,13 +76,13 @@ body {
   font-family: var(--font-body); font-weight: 400; font-size: var(--t-base);
   line-height: 1.5; letter-spacing: 0.2px;
 }
-/* Luz ambiente: un halo cálido de la vitrina y un halo azul del logo, fijos y muy suaves */
+/* Luz ambiente: halos cálidos de la vitrina, fijos y muy suaves */
 body::before {
   content: ""; position: fixed; inset: -10%; z-index: -1; pointer-events: none;
   background:
-    radial-gradient(38% 32% at 12% 8%, rgba(78, 172, 233, 0.12), transparent 70%),
+    radial-gradient(38% 32% at 12% 8%, rgba(255, 238, 205, 0.6), transparent 70%),
     radial-gradient(40% 34% at 88% 30%, rgba(239, 228, 207, 0.9), transparent 70%),
-    radial-gradient(45% 35% at 40% 98%, rgba(123, 193, 239, 0.1), transparent 70%);
+    radial-gradient(45% 35% at 40% 98%, rgba(239, 228, 207, 0.6), transparent 70%);
   filter: blur(30px);
 }
 ::selection { background: var(--tinta); color: #fff; }
@@ -149,7 +149,7 @@ h2 {
    Aviso + encabezado
    ========================================================== */
 .aviso-barra {
-  background: var(--marca); color: var(--tinta);
+  background: var(--tinta); color: #f4efe6;
   text-align: center; font-size: var(--t-micro); line-height: 1.3; letter-spacing: var(--track-micro);
   text-transform: uppercase; padding: 9px 16px;
 }
@@ -175,7 +175,7 @@ h2 {
   position: relative; display: inline-flex; align-items: center; min-height: 44px;
   font-size: var(--t-micro); line-height: 1; letter-spacing: var(--track-micro); text-transform: uppercase; color: var(--tinta);
 }
-/* Subrayado de latón que crece desde el centro; azul en la sección activa */
+/* Subrayado de latón que crece desde el centro; tinta en la sección activa */
 .nav-links a::after {
   content: ""; position: absolute; left: 0; right: 0; bottom: 10px; height: 1px;
   background: var(--laton); transform: scaleX(0); transition: transform var(--dur-base) var(--ease-out);
@@ -234,7 +234,7 @@ h2 {
   position: absolute; left: -28px; bottom: 36px; display: grid; place-items: center;
   width: 104px; height: 104px; border-radius: 50%; padding: 6px; background: #fff; box-shadow: var(--sombra-1);
 }
-.portada-sello img { width: 100%; height: 100%; border-radius: 50%; aspect-ratio: 1; }
+.portada-sello img { width: 100%; height: 100%; object-fit: contain; padding: 14px; }
 .portada-pie {
   position: absolute; right: 18px; bottom: 18px; padding: 8px 14px; border-radius: var(--r-pill);
   background: rgba(253, 251, 247, 0.88); backdrop-filter: blur(6px);
@@ -344,7 +344,7 @@ h2 {
    Contacto
    ========================================================== */
 .contacto { background: linear-gradient(180deg, transparent, var(--fondo-banda)); }
-.contact-grid { display: grid; gap: 14px; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.contact-grid { display: grid; gap: 14px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
 .contact-item {
   display: flex; flex-direction: column; gap: 14px; padding: 24px 22px;
   border: 1px solid var(--linea); border-radius: var(--r-md); background: rgba(255, 255, 255, 0.7);
@@ -353,6 +353,12 @@ h2 {
 .contact-item .ico { color: var(--precio); }
 .contact-item small { font-size: var(--t-micro); letter-spacing: var(--track-micro); text-transform: uppercase; color: var(--texto-suave); }
 .contact-item strong { font-weight: 400; font-size: var(--t-base); letter-spacing: 0.04em; }
+/* Tarjeta de direcciones: ocupa toda la fila, un punto de venta por columna */
+.contact-direcciones { grid-column: 1 / -1; }
+.direcciones { list-style: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px 28px; }
+.direcciones li { display: grid; gap: 6px; padding-top: 14px; border-top: 1px solid var(--linea); }
+.direcciones strong { font-weight: 400; font-size: var(--t-base); letter-spacing: 0.04em; }
+.direcciones span { font-size: var(--t-sm); line-height: 1.6; color: var(--texto-suave); }
 @media (hover: hover) and (pointer: fine) {
   a.contact-item:hover { transform: translateY(-3px); box-shadow: var(--sombra-1); border-color: var(--linea-fuerte); }
 }
@@ -364,7 +370,8 @@ h2 {
 .pie::before { content: ""; position: absolute; inset: 0 0 auto; height: 1px; background: var(--brillo-laton); }
 .pie-grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 40px; }
 .pie-marca { display: grid; gap: 18px; align-content: start; }
-.pie-marca img { width: 72px; height: 72px; border-radius: 50%; }
+/* Logo negro invertido para que se lea sobre el pie oscuro */
+.pie-marca img { width: 96px; height: auto; filter: invert(1) brightness(0.95); }
 .pie-marca p { font-size: var(--t-sm); line-height: 1.7; color: #cfc6b6; max-width: 34ch; }
 .pie h2 { font-size: var(--t-micro); letter-spacing: var(--track-micro); color: #d9c38f; margin-bottom: 18px; }
 .pie ul { list-style: none; display: grid; gap: 4px; }
@@ -402,6 +409,9 @@ h2 {
 @media (max-width: 1099px) {
   .pie-grid { grid-template-columns: 1fr 1fr; }
   .contact-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .direcciones { grid-template-columns: 1fr; }
+  /* Con dos columnas, Ubicación ocupa la fila completa para no quedar sola */
+  .contact-grid > .contact-item:nth-child(3) { grid-column: 1 / -1; }
 }
 
 @media (max-width: 899px) {
@@ -464,6 +474,12 @@ h2 {
   .tabbar a[aria-current="true"] { color: var(--acento); }
   .tabbar a:active { background: var(--champagne-200); border-radius: 14px; }
   body { padding-bottom: calc(84px + env(safe-area-inset-bottom)); }
+}
+
+/* Celular angosto: las cuatro secciones caben sin deslizar (antes "Accesorios" quedaba oculto a la derecha) */
+@media (max-width: 519px) {
+  .filters-sec { width: 100%; justify-content: space-between; gap: 2px; padding: 4px; }
+  .filters-sec .filter { flex: 1 1 auto; padding: 0 4px; letter-spacing: 0.08em; }
 }
 
 @media (max-width: 479px) {

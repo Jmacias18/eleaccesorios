@@ -48,7 +48,7 @@
     <a href="#inicio" class="cab-logo" aria-label="Ele Accesorios, inicio"><img src="/logo-negro.png" width="381" height="310" alt="Ele Accesorios" /></a>
     <div class="cab-acciones">
       <a class="cab-icono" href="https://www.instagram.com/ele_acces" target="_blank" rel="noopener" aria-label="Instagram de Ele Accesorios"><svg class="ico" aria-hidden="true"><use href="#i-ig"/></svg></a>
-      <a href="#" class="btn btn-tinta btn-sm" data-wa="Hola, quiero información sobre sus accesorios." aria-label="Pedir por Facebook"><svg class="ico" aria-hidden="true"><use href="#i-fb"/></svg><span class="btn-texto">Facebook</span></a>
+      <a href="#" class="cab-icono" data-wa="Hola, quiero información sobre sus accesorios." aria-label="Facebook de Ele Accesorios"><svg class="ico" aria-hidden="true"><use href="#i-fb"/></svg></a>
     </div>
   </div>
 </header>
@@ -79,7 +79,7 @@
           <img src="/portada-pulseras.jpg" width="1200" height="1600" fetchpriority="high"
                alt="Pulseras de corazones con cristales de colores sobre un exhibidor de terciopelo" />
         </picture>
-        <span class="portada-sello" aria-hidden="true"><img src="/logo-512.png" width="96" height="96" alt="" /></span>
+        <span class="portada-sello" aria-hidden="true"><img src="/logo-negro.png" width="381" height="310" alt="" /></span>
       </figure>
     </div>
   </section>
@@ -142,6 +142,14 @@
         <div class="contact-item" data-revelar style="--i:3">
           <svg class="ico" aria-hidden="true"><use href="#i-pin"/></svg><small>Ubicación</small><strong>San Luis Río Colorado</strong>
         </div>
+        <div class="contact-item contact-direcciones" data-revelar style="--i:4">
+          <svg class="ico" aria-hidden="true"><use href="#i-pin"/></svg><small>Direcciones</small>
+          <ul class="direcciones">
+            <li><strong>Koy Colectivo</strong><span>Callejón Ley de Alfabetización, entre calles 12 y 13</span></li>
+            <li><strong>Mini Colectivo Melisa Rivera</strong><span>Entre Callejón Zacatecas y Av. Quintana Roo, calle 34</span></li>
+            <li><strong>Esmeralda Colectivo</strong><span>Av. 20 de Noviembre y calle 22</span></li>
+          </ul>
+        </div>
       </div>
     </div>
   </section>
@@ -160,7 +168,7 @@
   <div class="container">
     <div class="pie-grid">
       <div class="pie-marca">
-        <img src="/logo-512.png" width="72" height="72" alt="Ele Accesorios" loading="lazy" />
+        <img src="/logo-negro.png" width="381" height="310" alt="Ele Accesorios" loading="lazy" />
         <p>Acero inoxidable y oro laminado · San Luis Río Colorado, Sonora.</p>
       </div>
       <div>
@@ -340,7 +348,7 @@ function revelar(el) {
 }
 document.querySelectorAll("[data-revelar]").forEach(revelar);
 
-// Sección visible: subrayado azul en el menú y color en la barra inferior
+// Sección visible: subrayado en el menú y color en la barra inferior
 const enlacesSeccion = [...document.querySelectorAll("[data-seccion]")];
 const marcarSeccion = new IntersectionObserver(entradas => {
   entradas.forEach(e => {

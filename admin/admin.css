@@ -1,6 +1,6 @@
 /* ==========================================================
    Panel (/admin). Mismo lenguaje que la tienda: crema, champagne,
-   latón fino, tinta de marca y azul del logo solo para estados e interacción.
+   latón fino y tinta de marca para estados e interacción. Sin azul.
    Es autocontenido: no depende de tokens.css ni de base.css.
    ========================================================== */
 
@@ -17,8 +17,8 @@
   --linea-fuerte: rgba(122, 92, 43, 0.4);
   --laton: #c9a45c;
   --laton-oscuro: #7a5c2b;
-  --marca: #4eace9;
-  --acento: #1a72b5;
+  --marca: #212123;
+  --acento: #212123;
   --disponible: #2f6f4a;
   --disponible-suave: #e8f1ea;
   --apartado: #8f4a1e;
@@ -83,7 +83,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .logo { display: flex; align-items: center; gap: 12px; font-size: 13px; letter-spacing: 0.22em; text-transform: uppercase; line-height: 1.2; }
 .logo span { color: var(--texto-suave); margin-left: 6px; }
 .logo small { display: block; margin-top: 3px; font-size: 9px; letter-spacing: 0.22em; color: var(--texto-tenue); }
-.logo-marca { border-radius: 6px; flex-shrink: 0; }
+.logo-marca { flex-shrink: 0; width: auto; object-fit: contain; }
 
 /* ---------- Login ---------- */
 .login {
@@ -113,7 +113,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
   transition: border-color 160ms ease, box-shadow 160ms ease;
 }
 .campo input::placeholder, .campo textarea::placeholder { color: var(--texto-tenue); opacity: 0.8; }
-.campo input:focus, .campo select:focus, .campo textarea:focus { outline: none; border-color: var(--acento); box-shadow: 0 0 0 3px rgba(78, 172, 233, 0.25); }
+.campo input:focus, .campo select:focus, .campo textarea:focus { outline: none; border-color: var(--acento); box-shadow: 0 0 0 3px rgba(201, 164, 92, 0.3); }
 .campo [aria-invalid="true"] { border-color: var(--peligro) !important; }
 .campo textarea { resize: vertical; min-height: 92px; line-height: 1.5; }
 .campo select {
@@ -150,7 +150,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 @media (max-width: 420px) {
   .solo-ancho { display: none; }
   .btn-tienda { padding: 0; width: 44px; }
-  .barra .logo-marca { width: 28px; height: 28px; }
+  .barra .logo-marca { width: auto; height: 28px; }
 }
 
 .contenedor {
@@ -169,7 +169,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
   border: 1px solid var(--linea-fuerte); border-radius: 999px; padding: 0 20px; min-height: 50px;
   transition: border-color 160ms ease, box-shadow 160ms ease;
 }
-.buscador input:focus { outline: none; border-color: var(--acento); box-shadow: 0 0 0 3px rgba(78, 172, 233, 0.25); }
+.buscador input:focus { outline: none; border-color: var(--acento); box-shadow: 0 0 0 3px rgba(201, 164, 92, 0.3); }
 
 .filtros {
   display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none;
@@ -314,7 +314,7 @@ dialog[open], dialog[open]::backdrop { opacity: 1; }
 .foto-preview img { width: 100%; height: 100%; object-fit: cover; }
 .foto-acciones { display: grid; gap: 6px; justify-items: start; }
 .foto-acciones label.btn { cursor: pointer; }
-.foto-acciones label.btn:has(input:focus-visible) { box-shadow: 0 0 0 3px rgba(78, 172, 233, 0.35); }
+.foto-acciones label.btn:has(input:focus-visible) { box-shadow: 0 0 0 3px rgba(201, 164, 92, 0.4); }
 .foto-acciones small { font-size: 12px; }
 
 .alerta {

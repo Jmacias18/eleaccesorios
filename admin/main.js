@@ -161,14 +161,15 @@ function render() {
   if (!equipos.length) {
     mostrarVacio("Aún no tienes piezas", "Agrega la primera y aparecerá en la tienda al instante.", "Agregar pieza", () => abrirFormulario());
   } else if (q) {
-    mostrarVacio(`Sin resultados para “${texto}”`, "Prueba con otra palabra, como la marca o el modelo.", "Limpiar búsqueda", () => {
+    mostrarVacio(`Sin resultados para “${texto}”`, "Prueba con otra palabra, como el tipo de pieza o su código.", "Limpiar búsqueda", () => {
       $("buscar").value = "";
       render();
       $("buscar").focus();
     });
   } else {
-    const est = estado(filtroEstado)?.label.toLowerCase();
-    mostrarVacio(`No hay piezas ${est}s`, "Cuando cambies el estado de una pieza aparecerá aquí.", "Ver todos", () => {
+    // "piezas" es femenino: disponibles, apartadas, vendidas
+    const est = { disponible: "disponibles", apartado: "apartadas", vendido: "vendidas" }[filtroEstado] || "";
+    mostrarVacio(`No hay piezas ${est}`, "Cuando cambies el estado de una pieza aparecerá aquí.", "Ver todos", () => {
       filtroEstado = "todos";
       render();
     });
@@ -382,7 +383,7 @@ form.addEventListener("submit", async e => {
   errorForm("");
 
   const nombre = form.nombre.value.trim();
-  if (!nombre) return errorCampo("nombre", "Escribe el nombre de la pieza, por ejemplo “iPhone 12 64 GB”.");
+  if (!nombre) return errorCampo("nombre", "Escribe el nombre de la pieza, por ejemplo “Collar corazón C80”.");
 
   let precio = null;
   if (!form.consultar.checked) {
