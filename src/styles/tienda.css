@@ -221,8 +221,8 @@ h2 {
 
 .portada-foto { position: relative; margin: 0; justify-self: end; width: min(100%, 480px, 60vh); }
 .portada-foto::before {
-  /* filete de latón desplazado, como un marco de vitrina */
-  content: ""; position: absolute; inset: -14px 14px 14px -14px; border: 1px solid var(--linea-fuerte);
+  /* filete de latón al ras de la foto, como un marco de vitrina */
+  content: ""; position: absolute; inset: 0; z-index: 1; border: 1px solid var(--linea-fuerte);
   border-radius: 999px 999px var(--r-md) var(--r-md); pointer-events: none;
 }
 .portada-foto picture, .portada-foto picture img {
@@ -231,7 +231,7 @@ h2 {
 }
 .portada-foto picture img { box-shadow: var(--sombra-2); background: var(--champagne-200); }
 .portada-sello {
-  position: absolute; left: -28px; bottom: 36px; display: grid; place-items: center;
+  position: absolute; z-index: 2; left: -28px; bottom: 36px; display: grid; place-items: center;
   width: 104px; height: 104px; border-radius: 50%; padding: 6px; background: var(--fondo); box-shadow: var(--sombra-1);
 }
 .portada-sello img { width: 100%; height: 100%; object-fit: contain; padding: 14px; }
@@ -427,7 +427,6 @@ h2 {
   .portada { padding-top: 20px; }
   .portada-grid { grid-template-columns: 1fr; gap: 36px; }
   .portada-foto { order: -1; justify-self: center; width: min(100%, 420px); }
-  .portada-foto::before { inset: -10px 10px 10px -10px; }
   .portada-foto picture, .portada-foto picture img { max-height: 46vh; min-height: 260px; }
   .aviso-barra { font-size: 10px; letter-spacing: 0.08em; padding: 8px 12px; }
   .portada-sello { width: 80px; height: 80px; left: -6px; bottom: 22px; }

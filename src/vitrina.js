@@ -4,7 +4,7 @@
 // Nunca inventa piezas ni cantidades: solo dibuja lo que recibe.
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { money, condicion, categoria, seccion, esc } from "./catalogo.js";
+import { money, condicion, categoria, seccion, esc, nombreVisible } from "./catalogo.js";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -85,15 +85,15 @@ function crearPieza(p) {
   const wrap = document.createElement("div");
   wrap.className = "pieza";
   wrap.innerHTML = `
-    <button type="button" class="pieza-btn" aria-label="${esc(p.nombre)}. Ver detalle">
+    <button type="button" class="pieza-btn" aria-label="${esc(nombreVisible(p.nombre))}. Ver detalle">
       <span class="pieza-img">
         <span class="pieza-foto ${p.foto_url ? "con-foto" : "sin-foto"}">${fotoHtml(p)}</span>
         ${p.foto_url ? '<span class="pieza-sombra" aria-hidden="true"></span>' : pendienteHtml()}
       </span>
-      <span class="pieza-nombre">${esc(p.nombre)}</span>
+      <span class="pieza-nombre">${esc(nombreVisible(p.nombre))}</span>
     </button>
     <div class="pieza-ficha" aria-hidden="true">
-      <strong>${esc(p.nombre)}</strong>
+      <strong>${esc(nombreVisible(p.nombre))}</strong>
       <span class="pieza-ficha-precio">${precioTexto(p)}</span>
       <span class="pieza-ficha-disp ${p.estado === "apartado" ? "apartado" : ""}">${disponibilidad(p)}</span>
     </div>`;

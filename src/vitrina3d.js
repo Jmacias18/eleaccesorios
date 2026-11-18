@@ -16,7 +16,7 @@ import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
 import { gsap } from "gsap";
 import { NIVELES, SOPORTE, nivelDe, precioTexto, disponibilidad, abrirDetalle } from "./vitrina.js";
-import { esc } from "./catalogo.js";
+import { esc, nombreVisible } from "./catalogo.js";
 import "./styles/vitrina3d.css";
 
 // ---------- Medidas del mueble (unidades = metros aproximados) ----------
@@ -495,10 +495,10 @@ export function crearVitrina3D(contenedor, { alFallar }) {
           const boton = document.createElement("button");
           boton.type = "button";
           boton.className = "v3d-pieza";
-          boton.setAttribute("aria-label", `${p.nombre}. ${precioTexto(p)}. ${disponibilidad(p)}. Ver detalle`);
+          boton.setAttribute("aria-label", `${nombreVisible(p.nombre)}. ${precioTexto(p)}. ${disponibilidad(p)}. Ver detalle`);
           boton.innerHTML = `
             <span class="v3d-etiqueta" aria-hidden="true">
-              <strong>${esc(p.nombre)}</strong>
+              <strong>${esc(nombreVisible(p.nombre))}</strong>
               <span class="v3d-precio">${esc(precioTexto(p))}</span>
               <span class="v3d-disp ${p.estado === "apartado" ? "apartado" : ""}">${esc(disponibilidad(p))}</span>
             </span>`;

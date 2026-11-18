@@ -70,6 +70,13 @@ export function textoPrecio(eq) {
   return (eq.desde ? "desde " : "") + money(eq.precio);
 }
 
+// Nombre para el estante: sin el código de inventario al final ("Collar C80" → "Collar").
+// El código se sigue mostrando en el detalle para que el cliente lo mencione al pedir.
+export function nombreVisible(nombre) {
+  const limpio = String(nombre ?? "").replace(/\s+[A-Za-z]{1,3}\d+$/, "").trim();
+  return limpio || String(nombre ?? "");
+}
+
 export function esc(s) {
   return String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
 }
