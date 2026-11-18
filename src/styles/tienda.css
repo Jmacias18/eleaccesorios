@@ -206,7 +206,7 @@ h2 {
   max-width: 14ch;
 }
 .portada h1 .acento { display: block; color: var(--texto-tenue); }
-.portada .lead { font-size: var(--t-base); max-width: 40ch; }
+.portada .lead { font-size: var(--t-base); max-width: 58ch; }
 .cta-row { display: flex; flex-wrap: wrap; gap: 12px; }
 
 .stats {
