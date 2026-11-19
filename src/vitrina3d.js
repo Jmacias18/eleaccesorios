@@ -25,7 +25,7 @@ const ALTO_PIEZA = 0.33;    // alto máximo de un soporte
 // El alto de fila y la banda de título dependen del tamaño en pantalla de las etiquetas (ver construir)
 const CORNISA = 0.12;
 const ZOCALO = 0.16;
-const PILAR = 0.07;
+const PILAR_ESCRITORIO = 0.07, PILAR_CELULAR = 0.035;
 const VIDRIO = 0.02;       // grosor de la repisa de cristal
 const FONDO_Z = -0.30;     // panel de terciopelo
 const REPISA_Z0 = -0.31, REPISA_Z1 = 0.05;
@@ -40,6 +40,7 @@ const punteroFino = matchMedia("(hover: hover) and (pointer: fine)").matches;
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 // En celular los soportes (y sus fotos) se ven más grandes; 1.28 es lo máximo que cabe en el HUECO
 const escalaPieza = () => (celular() ? 1.28 : 1);
+const pilar = () => (celular() ? PILAR_CELULAR : PILAR_ESCRITORIO);
 
 // ---------- Texturas generadas (sin descargar imágenes) ----------
 function lienzo(w, h = w) {
@@ -183,7 +184,7 @@ function crearGeometrias() {
     poste: cil(0.0045, 0.25, 16),
     barra: horizontal(cil(0.004, 0.25, 16)),
     remate: new THREE.SphereGeometry(0.0075, 16, 12),
-    tarjeta: new RoundedBoxGeometry(0.22, 0.2, 0.008, 2, 0.003),
+    tarjeta: new RoundedBoxGeometry(0.25, 0.22, 0.008, 2, 0.003),
     gancho: new THREE.TorusGeometry(0.006, 0.0012, 8, 20),
     caja: new RoundedBoxGeometry(0.24, 0.06, 0.16, 3, 0.012),
     rodillo: horizontal(cil(0.02, 0.215, 28)),
@@ -223,7 +224,8 @@ export function crearVitrina3D(contenedor, { alFallar }) {
   // ----- Three.js -----
   // En celular: sin antialias por hardware, menos píxeles y sin mapa de sombras (las sombras de contacto ya son planos)
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: alta, alpha: true, powerPreference: "high-performance" });
-  renderer.setPixelRatio(Math.min(devicePixelRatio, alta ? 2 : 1.25));
+  // En celular también hasta 2x: con 1.25 las fotos se veían borrosas en pantallas de alta densidad
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.05;
@@ -360,8 +362,8 @@ export function crearVitrina3D(contenedor, { alFallar }) {
       g.add(malla(G.remate, M.laton, -0.125, 0.262, 0), malla(G.remate, M.laton, 0.125, 0.262, 0));
       [-0.07, 0.07].forEach(x => g.add(malla(G.gancho, M.laton, x, 0.254, 0.004)));
       g.add(malla(G.tarjeta, M.terciopelo, 0, 0.152, 0.008));
-      const pl = placa(0.19, 0.17, p);
-      pl.position.set(0, 0.152, 0.0125);
+      const pl = placa(0.23, 0.205, p);
+      pl.position.set(0, 0.153, 0.0125);
       g.add(pl);
     } else if (tipo === "cojin") {
       g.add(malla(G.caja, M.terciopelo, 0, 0.03, 0));
@@ -433,7 +435,7 @@ export function crearVitrina3D(contenedor, { alFallar }) {
     piezasActuales = piezas;
     contenido = new THREE.Group();
     anchoInt = cols * HUECO;
-    anchoExt = anchoInt + 2 * PILAR + 0.04;
+    anchoExt = anchoInt + 2 * pilar() + (celular() ? 0.02 : 0.04);
     // Espacio para la etiqueta de precio que cuelga bajo cada repisa (en metros, según el ancho de pantalla)
     u = (anchoExt * (celular() ? 1.03 : 1.04)) / anchoPx;
     const etiqueta = (celular() ? 54 : 62) * u;
@@ -540,8 +542,8 @@ export function crearVitrina3D(contenedor, { alFallar }) {
     contenido.add(caja(anchoExt, 0.012, 0.012, M.laton, 0, -CORNISA + 0.006, zEst + dEst / 2));
     contenido.add(caja(anchoInt, 0.004, 0.012, luces[0]?.led || M.laton, 0, -CORNISA - 0.003, REPISA_Z1 - 0.035));
     [-1, 1].forEach(lado => {
-      const x = lado * (anchoInt / 2 + PILAR / 2);
-      contenido.add(caja(PILAR, cuerpo - CORNISA, dEst, M.marmol, x, -(CORNISA + cuerpo) / 2, zEst));
+      const x = lado * (anchoInt / 2 + pilar() / 2);
+      contenido.add(caja(pilar(), cuerpo - CORNISA, dEst, M.marmol, x, -(CORNISA + cuerpo) / 2, zEst));
       contenido.add(caja(0.006, cuerpo - CORNISA, 0.006, M.laton, lado * (anchoInt / 2 + 0.003), -(CORNISA + cuerpo) / 2, zEst + dEst / 2));
     });
     contenido.add(caja(anchoExt, ZOCALO, dEst, M.marmol, 0, fondo - ZOCALO / 2, zEst));
