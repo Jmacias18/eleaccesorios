@@ -403,8 +403,9 @@ export function crearVitrina3D(contenedor, { alFallar }) {
   }
 
   function calcularColumnas() {
-    const min = celular() ? 112 : 300;
-    return clamp(Math.floor(anchoPx / min), 3, celular() ? 4 : 5);
+    // Celular: 2 piezas por repisa (con 3 las fotos quedaban de ~100 px en 390 px de ancho)
+    if (celular()) return clamp(Math.floor(anchoPx / 170), 2, 3);
+    return clamp(Math.floor(anchoPx / 300), 3, 5);
   }
 
   // ----- Mueble y piezas -----
