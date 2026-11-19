@@ -65,7 +65,9 @@ let niveles = [];            // { cont, n } de la vitrina actual, para repartir 
 
 const nivelDe = p => NIVELES.find(n => n.categorias.includes(p.categoria)) || NIVELES[NIVELES.length - 1];
 const precioTexto = p => p.precio == null ? "Consultar precio" : (p.desde ? "desde " : "") + money(p.precio);
-const disponibilidad = p => p.estado === "apartado" ? "Apartado · consultar" : "Disponible";
+// La tienda solo dice si hay o no (nunca la cantidad). en_stock viene de la existencia del inventario.
+const agotado = p => p.en_stock === false;
+const disponibilidad = p => agotado(p) ? "No disponible" : "En stock";
 
 // Soporte de exhibición (sin foto). Solo forma y material; no es un icono de producto.
 const soporteHtml = p => `<span class="pieza-soporte soporte-${SOPORTE[p.categoria] || "base"}" aria-hidden="true"></span>`;
@@ -95,7 +97,7 @@ function crearPieza(p) {
     <div class="pieza-ficha" aria-hidden="true">
       <strong>${esc(nombreVisible(p.nombre))}</strong>
       <span class="pieza-ficha-precio">${precioTexto(p)}</span>
-      <span class="pieza-ficha-disp ${p.estado === "apartado" ? "apartado" : ""}">${disponibilidad(p)}</span>
+      <span class="pieza-ficha-disp ${agotado(p) ? "agotado" : ""}">${disponibilidad(p)}</span>
     </div>`;
   wrap.querySelector(".pieza-btn").addEventListener("click", () => abrirDetalle(p));
   // Si la foto no carga, se muestra el soporte en su lugar
@@ -126,16 +128,17 @@ function abrirDetalle(p) {
     <div class="detalle-foto ${p.foto_url ? "con-foto" : "sin-foto"}">${fotoHtml(p)}${p.foto_url ? "" : pendienteHtml()}</div>
     <div class="detalle-texto">
       <span class="micro">${esc([sec, cat].filter(Boolean).join(" · "))}</span>
-      <h2>${esc(p.nombre)}</h2>
+      <h2>${esc(nombreVisible(p.nombre))}</h2>
+      ${p.codigo ? `<p class="detalle-codigo">Código ${esc(p.codigo)}</p>` : ""}
       <p class="detalle-precio">${precioTexto(p)}</p>
       <p class="detalle-disp">
-        <span class="detalle-chip ${p.estado === "apartado" ? "apartado" : ""}">${disponibilidad(p)}</span>
+        <span class="detalle-chip ${agotado(p) ? "agotado" : ""}">${disponibilidad(p)}</span>
         ${cond ? `<span>${esc(cond)}</span>` : ""}
       </p>
       ${p.descripcion ? `<p class="detalle-desc">${esc(p.descripcion)}</p>` : ""}
       <div class="detalle-acciones">
         <a class="btn btn-tinta" href="${esc(FACEBOOK_URL)}" target="_blank" rel="noopener">Pedir por Facebook</a>
-        <p class="detalle-nota">Escribe el nombre de la pieza y te confirmamos la disponibilidad por Facebook.</p>
+        <p class="detalle-nota">Escribe ${p.codigo ? "el código" : "el nombre"} de la pieza y te confirmamos la disponibilidad por Facebook.</p>
       </div>
     </div>`;
   detalle.querySelector(".detalle-cerrar").addEventListener("click", () => detalle.close());
@@ -270,7 +273,7 @@ function pintar(contenedor, piezas) {
 }
 
 // Lo comparte la vitrina WebGL (src/vitrina3d.js)
-export { NIVELES, SOPORTE, nivelDe, precioTexto, disponibilidad, abrirDetalle };
+export { NIVELES, SOPORTE, nivelDe, precioTexto, disponibilidad, agotado, abrirDetalle };
 
 // ----- Elección de vitrina: WebGL (Three.js, cargado bajo demanda) o la versión CSS como respaldo -----
 // ?vitrina=css fuerza la versión CSS (útil para comparar o en equipos con problemas).

@@ -36,7 +36,7 @@
 }
 .v3d-precio { font-size: 12px; color: #6f5a3a; }
 .v3d-disp { font-size: 9px; letter-spacing: 1.4px; text-transform: uppercase; color: #8a7a5e; }
-.v3d-disp.apartado { color: #8f4a1e; }
+.v3d-disp.agotado { color: #8f4a1e; }
 
 /* Título de cada nivel sobre la banda de latón */
 .v3d-nivel {
@@ -50,7 +50,7 @@
   .v3d-etiqueta { margin-top: 5px; padding: 3px 5px 4px; }
   .v3d-etiqueta strong, .v3d-precio { font-size: 10px; letter-spacing: 0; }
   .v3d-disp { display: none; }
-  .v3d-disp.apartado { display: block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 8px; letter-spacing: 0.6px; }
+  .v3d-disp.agotado { display: block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 8px; letter-spacing: 0.6px; }
   .v3d-nivel { font-size: 9px; letter-spacing: 1.4px; }
   .v3d-nivel span { display: block; margin: 2px 0 0; font-size: 9px; }
 }

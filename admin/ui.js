@@ -29,9 +29,11 @@ const dlgEliminar = $("dlg-eliminar");
 let accionEliminar = null;
 
 // accion: async () => false si falló (el diálogo queda abierto)
-export function confirmarEliminar({ nombre, nota = "", accion }) {
+// extra: texto después del nombre ("y su foto" para piezas; vacío para movimientos)
+export function confirmarEliminar({ nombre, nota = "", extra = " y su foto", accion }) {
   accionEliminar = accion;
   $("eliminar-nombre").textContent = nombre;
+  $("eliminar-extra").textContent = extra;
   $("eliminar-nota").innerHTML = nota; // texto fijo del código, no del usuario
   $("eliminar-nota").hidden = !nota;
   dlgEliminar.showModal();

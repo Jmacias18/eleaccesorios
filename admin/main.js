@@ -1,8 +1,11 @@
 import { supabase, configurado } from "../src/supabase.js";
-import { SECCIONES, CONDICIONES, ESTADOS, subcategoriasDe, seccion, categoria, condicion, estado, textoPrecio, esc } from "../src/catalogo.js";
+import { SECCIONES, CONDICIONES, subcategoriasDe, seccion, categoria, condicion, textoPrecio, esc } from "../src/catalogo.js";
 import * as fotos from "../src/fotos.js";
 import { icono } from "../src/iconos.js";
 import { $, aviso, kb, htmlError, setOcupado, confirmarEliminar } from "./ui.js";
+import { datos, avisarCambio, cargarMovimientos, refrescarEquipo, normalizar, entero } from "./datos.js";
+import { abrirMovimiento } from "./inventario.js";
+import "./dashboard.js";
 
 // <span data-ico="nombre"> → SVG
 document.querySelectorAll("[data-ico]").forEach(el => (el.outerHTML = icono(el.dataset.ico, `ico ${el.className}`.trim())));
@@ -19,6 +22,23 @@ const vistas = {
 function mostrar(nombre) {
   Object.entries(vistas).forEach(([k, el]) => (el.hidden = k !== nombre));
 }
+
+// Pestañas del panel: #piezas, #inventario, #movimientos, #dashboard
+const VISTAS_PANEL = ["piezas", "inventario", "movimientos", "dashboard"];
+function mostrarPestana() {
+  const actual = VISTAS_PANEL.includes(location.hash.slice(1)) ? location.hash.slice(1) : "piezas";
+  VISTAS_PANEL.forEach(v => ($("vista-" + v).hidden = v !== actual));
+  document.querySelectorAll(".pestana").forEach(a => {
+    if (a.dataset.vista === actual) a.setAttribute("aria-current", "page");
+    else a.removeAttribute("aria-current");
+  });
+  document.body.dataset.vista = actual;
+  avisarCambio();
+}
+addEventListener("hashchange", () => {
+  mostrarPestana();
+  scrollTo(0, 0);
+});
 
 function errorLogin(msg) {
   const el = $("error-login");
@@ -46,7 +66,12 @@ async function entrarAlPanel(session) {
   }
   $("correo-sesion").textContent = session.user.email;
   mostrar("panel");
+  mostrarPestana();
   cargarEquipos();
+  cargarMovimientos().catch(err => {
+    console.error(err);
+    aviso("No se pudieron cargar los movimientos. ¿Ya corriste supabase/inventario.sql?", true);
+  });
 }
 
 async function iniciar() {
@@ -99,7 +124,20 @@ $("btn-salir").addEventListener("click", () => supabase.auth.signOut());
 let equipos = [];
 let filtroEstado = "todos";
 
-const normalizar = s => (s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase();
+// Filtros de la lista de piezas
+const FILTROS = [
+  { id: "todos", label: "Todas", si: () => true },
+  { id: "tienda", label: "En la tienda", si: e => e.estado !== "vendido" },
+  { id: "sin-stock", label: "Sin stock", si: e => (e.existencia ?? 0) === 0 },
+  { id: "ocultas", label: "Ocultas", si: e => e.estado === "vendido" },
+];
+const filtro = id => FILTROS.find(f => f.id === id) || FILTROS[0];
+
+// "Mostrar en la tienda": estado = disponible (se muestra) o vendido (oculta). "apartado" ya no se usa.
+const VISIBILIDAD = [
+  { id: "disponible", label: "Sí, mostrar" },
+  { id: "vendido", label: "No, ocultar" },
+];
 
 const ESQUELETO = `
   <li class="equipo cargando" aria-hidden="true">
@@ -137,21 +175,24 @@ async function cargarEquipos() {
   equipos = data;
   render();
 }
+datos.reemplazarEquipo = fila => reemplazar(fila);
 
 function render() {
-  const cuenta = id => equipos.filter(e => id === "todos" || e.estado === id).length;
-  $("filtros").innerHTML = [{ id: "todos", label: "Todos" }, ...ESTADOS]
+  datos.equipos = equipos;
+  avisarCambio();
+  const cuenta = id => equipos.filter(filtro(id).si).length;
+  $("filtros").innerHTML = FILTROS
     .map(f => `<button type="button" class="filtro" data-estado="${f.id}" aria-pressed="${f.id === filtroEstado}">${f.label}<span class="n">${cuenta(f.id)}</span></button>`)
     .join("");
 
-  const disponibles = cuenta("disponible");
-  $("resumen").textContent = `${equipos.length} en total · ${disponibles} disponible${disponibles === 1 ? "" : "s"} en la tienda`;
+  const enStock = equipos.filter(e => e.estado !== "vendido" && e.existencia > 0).length;
+  $("resumen").textContent = `${equipos.length} en total · ${enStock} en stock en la tienda`;
 
   const texto = $("buscar").value.trim();
   const q = normalizar(texto);
   const visibles = equipos.filter(e =>
-    (filtroEstado === "todos" || e.estado === filtroEstado) &&
-    (!q || normalizar(`${e.nombre} ${e.descripcion}`).includes(q))
+    filtro(filtroEstado).si(e) &&
+    (!q || normalizar(`${e.codigo ?? ""} ${e.nombre} ${e.descripcion ?? ""}`).includes(q))
   );
 
   $("lista").innerHTML = visibles.map(itemHtml).join("");
@@ -167,13 +208,18 @@ function render() {
       $("buscar").focus();
     });
   } else {
-    // "piezas" es femenino: disponibles, apartadas, vendidas
-    const est = { disponible: "disponibles", apartado: "apartadas", vendido: "vendidas" }[filtroEstado] || "";
-    mostrarVacio(`No hay piezas ${est}`, "Cuando cambies el estado de una pieza aparecerá aquí.", "Ver todos", () => {
+    mostrarVacio(`Ninguna pieza en “${filtro(filtroEstado).label}”`, "Prueba con otro filtro.", "Ver todas", () => {
       filtroEstado = "todos";
       render();
     });
   }
+}
+
+function etiquetaStock(e) {
+  if (e.estado === "vendido") return `<span class="etiqueta vendido">Oculta</span>`;
+  const n = e.existencia ?? 0;
+  if (n === 0) return `<span class="etiqueta apartado">Sin stock</span>`;
+  return `<span class="etiqueta disponible">${entero(n)} en stock</span>`;
 }
 
 function itemHtml(e) {
@@ -187,16 +233,16 @@ function itemHtml(e) {
     <li class="equipo${vendido ? " es-vendido" : ""}" data-id="${e.id}">
       <div class="miniatura">${img}</div>
       <div class="equipo-info">
-        <h3>${esc(e.nombre)}</h3>
+        <h3>${e.codigo ? `<span class="codigo">${esc(e.codigo)}</span> ` : ""}${esc(e.nombre)}</h3>
         <div class="equipo-meta">${esc([seccion(e.seccion)?.label, cat?.label || e.categoria].filter(Boolean).join(" · "))}${cond ? " · " + cond.label : ""}</div>
         <div class="equipo-fila">
           <span class="equipo-precio${e.precio == null ? " consultar" : ""}">${esc(textoPrecio(e))}</span>
-          <span class="etiqueta ${e.estado}">${estado(e.estado)?.label || e.estado}</span>
+          ${etiquetaStock(e)}
         </div>
       </div>
       <div class="equipo-acciones">
         <button type="button" class="btn btn-ghost btn-sm" data-accion="editar">Editar</button>
-        <button type="button" class="btn btn-ghost btn-sm" data-accion="vendido">${vendido ? "Reactivar" : "Marcar vendido"}</button>
+        <button type="button" class="btn btn-ghost btn-sm" data-accion="movimiento">Alta / baja</button>
         <button type="button" class="btn btn-ghost btn-sm btn-eliminar" data-accion="eliminar">Eliminar</button>
       </div>
     </li>`;
@@ -217,7 +263,7 @@ $("lista").addEventListener("click", e => {
   const eq = equipos.find(x => x.id === b.closest("[data-id]").dataset.id);
   if (!eq) return;
   if (b.dataset.accion === "editar") abrirFormulario(eq);
-  if (b.dataset.accion === "vendido") alternarVendido(eq, b);
+  if (b.dataset.accion === "movimiento") abrirMovimiento({ equipo: eq });
   if (b.dataset.accion === "eliminar") pedirEliminar(eq);
 });
 
@@ -228,25 +274,13 @@ function reemplazar(fila) {
   render();
 }
 
-async function alternarVendido(eq, btn) {
-  const nuevo = eq.estado === "vendido" ? "disponible" : "vendido";
-  btn.disabled = true;
-  const { data, error } = await supabase.from("equipos").update({ estado: nuevo }).eq("id", eq.id).select().single();
-  if (error) {
-    btn.disabled = false;
-    return aviso("No se pudo cambiar el estado. Inténtalo de nuevo.", true);
-  }
-  reemplazar(data);
-  aviso(nuevo === "vendido" ? `“${eq.nombre}” marcado como vendido. Ya no aparece en la tienda.` : `“${eq.nombre}” vuelve a estar disponible.`);
-}
-
 /* ==========================================================
    Eliminar (con confirmación)
    ========================================================== */
 function pedirEliminar(eq) {
   confirmarEliminar({
     nombre: eq.nombre,
-    nota: "Si solo se vendió, usa <b>Marcar vendido</b>: así queda en tu historial.",
+    nota: "Si solo se acabó, registra la <b>baja</b>: la tienda mostrará “No disponible” y queda en tu historial. Sus movimientos se conservan aunque la elimines.",
     accion: async () => {
       const { error } = await supabase.from("equipos").delete().eq("id", eq.id);
       if (error) {
@@ -275,7 +309,7 @@ let guardando = false;
 const opciones = lista => lista.map(o => `<option value="${o.id}">${o.label}</option>`).join("");
 $("sel-seccion").innerHTML = opciones(SECCIONES);
 $("sel-condicion").insertAdjacentHTML("beforeend", opciones(CONDICIONES));
-$("sel-estado").innerHTML = opciones(ESTADOS);
+$("sel-estado").innerHTML = opciones(VISIBILIDAD);
 
 // Las subcategorías dependen de la sección elegida (Mujer, Hombre o Accesorios).
 function llenarSubcategorias(seccionId, valor = null) {
@@ -293,6 +327,15 @@ function abrirFormulario(eq = null) {
   $("titulo-form").textContent = eq ? "Editar pieza" : "Nueva pieza";
 
   form.nombre.value = eq?.nombre || "";
+  form.codigo.value = eq?.codigo || "";
+  form.costo.value = eq?.costo ?? "";
+  form.precio_mayoreo.value = eq?.precio_mayoreo ?? "";
+  form.inv_minimo.value = eq?.inv_minimo || "";
+  form.existencia.value = "";
+  // La existencia de una pieza ya creada solo cambia con altas y bajas (queda registro)
+  $("campo-existencia").hidden = !!eq;
+  $("ayuda-existencia").hidden = !eq;
+  $("ayuda-existencia").textContent = eq ? `Existencia actual: ${entero(eq.existencia ?? 0)}. Para cambiarla usa “Alta / baja”.` : "";
   form.seccion.value = eq?.seccion || "mujer";
   llenarSubcategorias(form.seccion.value, eq?.categoria || subcategoriasDe(form.seccion.value)[0]?.id);
   form.condicion.value = eq?.condicion || "";
@@ -300,7 +343,7 @@ function abrirFormulario(eq = null) {
   form.precio.value = eq?.precio ?? "";
   form.consultar.checked = eq ? eq.precio == null : false;
   form.desde.checked = !!eq?.desde;
-  form.estado.value = eq?.estado || "disponible";
+  form.estado.value = eq?.estado === "vendido" ? "vendido" : "disponible";
   sincronizarPrecio();
   liberarPreview();
   pintarFoto(eq?.foto_url || null);
@@ -316,7 +359,7 @@ function errorForm(msg) {
   const el = $("error-form");
   el.innerHTML = htmlError(msg);
   el.hidden = !msg;
-  ["nombre", "precio"].forEach(n => errorCampo(n, ""));
+  ["nombre", "codigo", "precio"].forEach(n => errorCampo(n, ""));
 }
 
 // Error junto al campo, con ícono (no solo color) y aria-invalid.
@@ -328,6 +371,7 @@ function errorCampo(nombre, msg) {
   if (msg) form[nombre].focus();
 }
 form.nombre.addEventListener("input", () => errorCampo("nombre", ""));
+form.codigo.addEventListener("input", () => errorCampo("codigo", ""));
 form.precio.addEventListener("input", () => errorCampo("precio", ""));
 
 function sincronizarPrecio() {
@@ -383,7 +427,13 @@ form.addEventListener("submit", async e => {
   errorForm("");
 
   const nombre = form.nombre.value.trim();
-  if (!nombre) return errorCampo("nombre", "Escribe el nombre de la pieza, por ejemplo “Collar corazón C80”.");
+  if (!nombre) return errorCampo("nombre", "Escribe el nombre de la pieza, por ejemplo “Collar corazón”.");
+  const codigo = form.codigo.value.trim().toUpperCase() || null;
+  if (codigo && equipos.some(x => x.id !== editando?.id && (x.codigo || "").toUpperCase() === codigo)) {
+    return errorCampo("codigo", `El código ${codigo} ya lo tiene otra pieza.`);
+  }
+  const numero = v => (v === "" ? null : Math.max(0, Number(v)));
+  const existenciaInicial = editando ? 0 : Math.floor(numero(form.existencia.value) || 0);
 
   let precio = null;
   if (!form.consultar.checked) {
@@ -395,6 +445,10 @@ form.addEventListener("submit", async e => {
 
   const fila = {
     nombre,
+    codigo,
+    costo: numero(form.costo.value),
+    precio_mayoreo: numero(form.precio_mayoreo.value),
+    inv_minimo: Math.floor(numero(form.inv_minimo.value) || 0),
     seccion: form.seccion.value,
     categoria: form.categoria.value,
     condicion: form.condicion.value || null,
@@ -426,12 +480,21 @@ form.addEventListener("submit", async e => {
     if (fotoAnterior && (fotoSubida || quitarFoto)) await fotos.borrar(fotoAnterior);
 
     reemplazar(data);
+    // Pieza nueva con existencia: se registra como alta "inicial" (la base suma la existencia)
+    if (existenciaInicial > 0) {
+      const { error: errMov } = await supabase.from("movimientos").insert({
+        equipo_id: data.id, tipo: "alta", motivo: "inicial", cantidad: existenciaInicial, nota: "Existencia inicial",
+      });
+      if (errMov) aviso("La pieza se guardó, pero no su existencia inicial. Regístrala con “Alta / baja”.", true);
+      await Promise.all([refrescarEquipo(data.id), cargarMovimientos().catch(() => {})]);
+    }
     guardando = false;
     dlg.close();
     aviso(editando ? "Cambios guardados." : `“${data.nombre}” agregado.`);
   } catch (err) {
     if (fotoSubida) await fotos.borrar(fotoSubida);
-    errorForm("No se guardó. Revisa tu conexión e inténtalo de nuevo. (" + (err.message || err) + ")");
+    if (err.code === "23505") errorCampo("codigo", `El código ${codigo} ya lo tiene otra pieza.`);
+    else errorForm("No se guardó. Revisa tu conexión e inténtalo de nuevo. (" + (err.message || err) + ")");
   } finally {
     ocupado(false);
   }

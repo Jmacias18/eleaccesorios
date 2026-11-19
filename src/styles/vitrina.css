@@ -278,7 +278,7 @@
 .pieza-ficha strong { font-weight: 400; font-size: 11px; letter-spacing: 1.2px; text-transform: uppercase; }
 .pieza-ficha-precio { font-size: 13px; color: #6f5a3a; }
 .pieza-ficha-disp { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gris-texto); }
-.pieza-ficha-disp.apartado { color: var(--rojo-700); }
+.pieza-ficha-disp.agotado { color: var(--rojo-700); }
 
 /* Interacción: la pieza se eleva, recibe luz y las fotos brillan con el metal */
 @media (hover: hover) and (pointer: fine) {
@@ -333,8 +333,9 @@ dialog.detalle[open]::backdrop { animation: detalle-velo 300ms ease; }
   background: #e8f1ea; color: #2f6f4a;
 }
 .detalle-chip::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
-.detalle-chip.apartado { background: #f6e9df; color: #8f4a1e; }
+.detalle-chip.agotado { background: #f6e9df; color: #8f4a1e; }
 .detalle-desc { margin: 0; font-size: 14px; line-height: 1.7; color: #4a4339; }
+.detalle-codigo { margin: -6px 0 0; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: #8a7a5e; }
 .detalle-acciones { margin-top: auto; padding-top: 12px; display: grid; gap: 10px; }
 .detalle-acciones .btn { width: 100%; }
 .detalle-nota { margin: 0; font-size: 12px; line-height: 1.5; color: #655d50; text-align: center; }

@@ -15,7 +15,7 @@ import * as THREE from "three";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
 import { gsap } from "gsap";
-import { NIVELES, SOPORTE, nivelDe, precioTexto, disponibilidad, abrirDetalle } from "./vitrina.js";
+import { NIVELES, SOPORTE, nivelDe, precioTexto, disponibilidad, agotado, abrirDetalle } from "./vitrina.js";
 import { esc, nombreVisible } from "./catalogo.js";
 import "./styles/vitrina3d.css";
 
@@ -461,10 +461,10 @@ export function crearVitrina3D(contenedor, { alFallar }) {
 
       // Banda de título con filete de latón
       contenido.add(caja(anchoInt, 0.006, 0.006, M.laton, 0, y - BANDA + 0.03, FONDO_Z + 0.006));
-      const disponibles = de.filter(p => p.estado === "disponible").length;
+      const disponibles = de.filter(p => !agotado(p)).length;
       const t = document.createElement("h3");
       t.className = "v3d-nivel";
-      t.innerHTML = `${esc(n.titulo)} <span>${disponibles} disponible${disponibles === 1 ? "" : "s"} · ${de.length} en vitrina</span>`;
+      t.innerHTML = `${esc(n.titulo)} <span>${disponibles} en stock · ${de.length} en vitrina</span>`;
       capa.appendChild(t);
       titulos.push({ el: t, y: y - tituloY });
       y -= BANDA;
@@ -515,7 +515,7 @@ export function crearVitrina3D(contenedor, { alFallar }) {
             <span class="v3d-etiqueta" aria-hidden="true">
               <strong>${esc(nombreVisible(p.nombre))}</strong>
               <span class="v3d-precio">${esc(precioTexto(p))}</span>
-              <span class="v3d-disp ${p.estado === "apartado" ? "apartado" : ""}">${esc(disponibilidad(p))}</span>
+              <span class="v3d-disp ${agotado(p) ? "agotado" : ""}">${esc(disponibilidad(p))}</span>
             </span>`;
           capa.appendChild(boton);
           const lugar = { p, x, piso, grupo, sombra, boton };

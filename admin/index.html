@@ -45,16 +45,25 @@
   <header class="barra">
     <div class="logo con-marca"><img class="logo-marca" src="/logo-negro.png" width="42" height="34" alt="" /><div>ELE<span>ACCESORIOS</span><small>PANEL</small></div></div>
     <nav class="barra-acciones" aria-label="Sesión">
-      <a href="/" class="btn btn-linea btn-sm btn-tienda" target="_blank" rel="noopener" aria-label="Ver tienda (se abre en otra pestaña)"><span class="solo-ancho">Ver tienda</span></a>
+      <a href="/" class="btn btn-linea btn-sm btn-tienda" target="_blank" rel="noopener" aria-label="Ver tienda (se abre en otra pestaña)"><span class="solo-ancho">Ver tienda</span><span data-ico="externo"></span></a>
       <button type="button" class="btn btn-linea btn-sm" id="btn-salir">Salir</button>
     </nav>
   </header>
 
+  <nav class="pestanas" aria-label="Secciones del panel">
+    <div class="pestanas-in">
+      <a href="#piezas" class="pestana" data-vista="piezas">Piezas</a>
+      <a href="#inventario" class="pestana" data-vista="inventario">Inventario</a>
+      <a href="#movimientos" class="pestana" data-vista="movimientos">Movimientos</a>
+      <a href="#dashboard" class="pestana" data-vista="dashboard">Dashboard</a>
+    </div>
+  </nav>
+
   <main class="contenedor">
-    <section aria-labelledby="titulo-piezas">
+    <section id="vista-piezas" class="vista" aria-labelledby="titulo-piezas">
       <div class="encabezado">
         <div>
-          <span class="eyebrow">Inventario</span>
+          <span class="eyebrow">Catálogo</span>
           <h1 id="titulo-piezas">Piezas</h1>
           <p class="muted" id="resumen" aria-live="polite">Cargando piezas…</p>
         </div>
@@ -64,9 +73,9 @@
       <div class="herramientas">
         <label class="buscador">
           <span class="sr">Buscar piezas</span>
-          <input type="search" id="buscar" placeholder="Buscar por nombre o descripción" autocomplete="off" enterkeyhint="search" />
+          <input type="search" id="buscar" placeholder="Buscar por código, nombre o descripción" autocomplete="off" enterkeyhint="search" />
         </label>
-        <div class="filtros" id="filtros" role="group" aria-label="Filtrar por estado"></div>
+        <div class="filtros" id="filtros" role="group" aria-label="Filtrar piezas"></div>
       </div>
 
       <ul class="lista" id="lista" aria-busy="true"></ul>
@@ -75,6 +84,99 @@
         <strong id="vacio-titulo"></strong>
         <p class="muted" id="vacio-texto"></p>
         <button type="button" class="btn btn-linea btn-sm" id="vacio-accion"></button>
+      </div>
+    </section>
+
+    <!-- INVENTARIO -->
+    <section id="vista-inventario" class="vista" aria-labelledby="titulo-inventario" hidden>
+      <div class="encabezado">
+        <div>
+          <span class="eyebrow">Inventario</span>
+          <h1 id="titulo-inventario">Existencias</h1>
+          <p class="muted" id="inv-resumen" aria-live="polite"></p>
+        </div>
+        <button type="button" class="btn btn-tinta" id="inv-nuevo-mov">Registrar movimiento</button>
+      </div>
+      <div class="herramientas">
+        <label class="buscador">
+          <span class="sr">Buscar en el inventario</span>
+          <input type="search" id="inv-buscar" placeholder="Buscar por código o nombre" autocomplete="off" enterkeyhint="search" />
+        </label>
+        <div class="filtros" id="inv-secciones" role="group" aria-label="Sección"></div>
+        <div class="filtros" id="inv-filtros" role="group" aria-label="Existencia"></div>
+      </div>
+      <div id="inv-lista"></div>
+      <div class="vacio" id="inv-vacio" hidden><strong>Sin productos</strong><p class="muted">No hay productos con estos filtros.</p></div>
+    </section>
+
+    <!-- MOVIMIENTOS -->
+    <section id="vista-movimientos" class="vista" aria-labelledby="titulo-movimientos" hidden>
+      <div class="encabezado">
+        <div>
+          <span class="eyebrow">Inventario</span>
+          <h1 id="titulo-movimientos">Movimientos</h1>
+          <p class="muted" id="mov-resumen" aria-live="polite"></p>
+        </div>
+        <button type="button" class="btn btn-tinta" id="mov-nuevo">Registrar movimiento</button>
+      </div>
+      <div class="herramientas">
+        <label class="buscador">
+          <span class="sr">Buscar movimientos</span>
+          <input type="search" id="mov-buscar" placeholder="Buscar por código, nombre o descripción" autocomplete="off" enterkeyhint="search" />
+        </label>
+        <div class="filtros" id="mov-periodos" role="group" aria-label="Periodo"></div>
+        <div class="rango-fechas" id="mov-rango" hidden>
+          <label class="campo"><span>Desde</span><input type="date" id="mov-desde" /></label>
+          <label class="campo"><span>Hasta</span><input type="date" id="mov-hasta" /></label>
+        </div>
+        <div class="filtros" id="mov-tipos" role="group" aria-label="Tipo"></div>
+        <div class="filtros" id="mov-secciones" role="group" aria-label="Sección"></div>
+      </div>
+      <ul class="lista movs" id="mov-lista"></ul>
+      <div class="vacio" id="mov-vacio" hidden><strong>Sin movimientos</strong><p class="muted">Las altas y bajas que registres aparecerán aquí.</p></div>
+    </section>
+
+    <!-- DASHBOARD -->
+    <section id="vista-dashboard" class="vista" aria-labelledby="titulo-dashboard" hidden>
+      <div class="encabezado">
+        <div>
+          <span class="eyebrow">Análisis</span>
+          <h1 id="titulo-dashboard">Dashboard</h1>
+          <p class="muted" id="dash-resumen" aria-live="polite"></p>
+        </div>
+      </div>
+      <div class="herramientas">
+        <div class="filtros" id="dash-periodos" role="group" aria-label="Periodo"></div>
+        <div class="rango-fechas" id="dash-rango" hidden>
+          <label class="campo"><span>Desde</span><input type="date" id="dash-desde" /></label>
+          <label class="campo"><span>Hasta</span><input type="date" id="dash-hasta" /></label>
+        </div>
+        <div class="fila-2 dash-selects">
+          <label class="campo"><span>Sección</span><select id="dash-seccion"></select></label>
+          <label class="campo"><span>Categoría</span><select id="dash-categoria"></select></label>
+        </div>
+      </div>
+      <p class="nota-aviso" id="dash-sin-costo" hidden></p>
+      <div class="kpis" id="dash-kpis"></div>
+      <div class="graficas">
+        <figure class="grafica">
+          <figcaption><strong>Ventas</strong><span class="muted" id="dash-serie-sub"></span></figcaption>
+          <div class="grafica-cuerpo" id="dash-serie"></div>
+        </figure>
+        <figure class="grafica">
+          <figcaption><strong>Por categoría</strong><span class="muted">Ventas del periodo y su utilidad</span></figcaption>
+          <div class="grafica-cuerpo" id="dash-categorias"></div>
+        </figure>
+      </div>
+      <div class="dash-productos">
+        <div class="dash-productos-cab">
+          <h2>Productos</h2>
+          <div class="filtros" id="dash-clases" role="group" aria-label="Clasificación"></div>
+        </div>
+        <p class="muted dash-ayuda">Toca un encabezado para ordenar. La clasificación compara cada producto contra la mediana del periodo: <b>Estrella</b> vende mucho y con buen margen; <b>Buen margen, lento</b> deja ganancia pero se vende poco; <b>Vende, poco margen</b> rota pero gana poco por pieza; <b>Revisar</b> vende poco y deja poco. <b>Rotación</b> = piezas vendidas por mes; <b>Días stock</b> = cuántos días alcanza la existencia a ese ritmo. Un margen con * sale del precio y el costo porque aún no hay ventas.</p>
+        <div class="tabla-envoltura" tabindex="0" role="region" aria-label="Tabla de productos">
+          <table class="tabla" id="dash-tabla"></table>
+        </div>
       </div>
     </section>
 
@@ -107,6 +209,13 @@
         <label for="f-nombre">Nombre <abbr title="obligatorio">*</abbr></label>
         <input id="f-nombre" name="nombre" required maxlength="120" autocomplete="off" enterkeyhint="next" aria-describedby="err-nombre" />
         <p class="campo-error" id="err-nombre" hidden></p>
+      </div>
+
+      <div class="campo">
+        <label for="f-codigo">Código</label>
+        <input id="f-codigo" name="codigo" maxlength="20" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="C80" aria-describedby="ayuda-codigo err-codigo" />
+        <p class="campo-ayuda" id="ayuda-codigo">El cliente lo menciona al pedir. No se puede repetir entre piezas.</p>
+        <p class="campo-error" id="err-codigo" hidden></p>
       </div>
 
       <div class="fila-2">
@@ -142,10 +251,36 @@
         <label class="check"><input type="checkbox" name="desde" /> <span>Mostrar como <b>“desde $…”</b></span></label>
       </fieldset>
 
+      <fieldset class="campo precio-campo">
+        <legend>Inventario</legend>
+        <div class="fila-2">
+          <div class="campo">
+            <label for="f-costo">Costo por pieza</label>
+            <div class="precio-input"><span aria-hidden="true">$</span><input id="f-costo" name="costo" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0" /></div>
+          </div>
+          <div class="campo">
+            <label for="f-mayoreo">Precio mayoreo</label>
+            <div class="precio-input"><span aria-hidden="true">$</span><input id="f-mayoreo" name="precio_mayoreo" type="number" inputmode="decimal" min="0" step="0.01" placeholder="0" /></div>
+          </div>
+        </div>
+        <div class="fila-2">
+          <div class="campo">
+            <label for="f-minimo">Inventario mínimo</label>
+            <input id="f-minimo" name="inv_minimo" type="number" inputmode="numeric" min="0" step="1" placeholder="0" />
+          </div>
+          <div class="campo" id="campo-existencia">
+            <label for="f-existencia">Existencia inicial</label>
+            <input id="f-existencia" name="existencia" type="number" inputmode="numeric" min="0" step="1" placeholder="0" />
+          </div>
+        </div>
+        <p class="campo-ayuda">El costo no se muestra en la tienda: sirve para calcular la utilidad. Con el mínimo, el inventario te avisa cuándo resurtir.</p>
+        <p class="campo-ayuda" id="ayuda-existencia" hidden></p>
+      </fieldset>
+
       <div class="campo">
-        <label for="sel-estado">Estado</label>
+        <label for="sel-estado">Mostrar en la tienda</label>
         <select name="estado" id="sel-estado" aria-describedby="ayuda-estado"></select>
-        <p class="campo-ayuda" id="ayuda-estado">Las vendidas no se muestran en la tienda.</p>
+        <p class="campo-ayuda" id="ayuda-estado">La tienda solo dice “En stock” o “No disponible”, según la existencia. Nunca muestra cantidades.</p>
       </div>
 
       <p class="error" id="error-form" role="alert" hidden></p>
@@ -158,10 +293,72 @@
   </form>
 </dialog>
 
+<!-- ALTA / BAJA -->
+<dialog id="dlg-mov" class="hoja" aria-labelledby="titulo-mov">
+  <form id="form-mov" novalidate>
+    <header class="hoja-cabecera">
+      <h2 id="titulo-mov">Registrar movimiento</h2>
+      <button type="button" class="cerrar" data-cerrar aria-label="Cerrar sin guardar">×</button>
+    </header>
+    <div class="hoja-cuerpo">
+      <div class="segmentado" role="radiogroup" aria-label="Tipo de movimiento">
+        <label><input type="radio" name="tipo" value="alta" checked /><span>Alta · entra</span></label>
+        <label><input type="radio" name="tipo" value="baja" /><span>Baja · sale</span></label>
+      </div>
+
+      <div class="campo">
+        <label for="mov-equipo">Producto</label>
+        <select id="mov-equipo" name="equipo" aria-describedby="mov-existencia"></select>
+        <p class="campo-ayuda" id="mov-existencia"></p>
+      </div>
+
+      <div class="fila-2">
+        <div class="campo">
+          <label for="mov-motivo">Motivo</label>
+          <select id="mov-motivo" name="motivo"></select>
+        </div>
+        <div class="campo">
+          <label for="mov-cantidad">Cantidad</label>
+          <input id="mov-cantidad" name="cantidad" type="number" inputmode="numeric" min="1" step="1" value="1" aria-describedby="err-cantidad" />
+          <p class="campo-error" id="err-cantidad" hidden></p>
+        </div>
+      </div>
+
+      <div class="campo" id="mov-campo-precio">
+        <label for="mov-precio">Precio cobrado por pieza</label>
+        <div class="precio-input"><span aria-hidden="true">$</span><input id="mov-precio" name="precio" type="number" inputmode="decimal" min="0" step="0.01" /></div>
+        <div class="atajos" id="mov-atajos"></div>
+      </div>
+
+      <div class="campo" id="mov-campo-costo">
+        <label for="mov-costo">Costo por pieza</label>
+        <div class="precio-input"><span aria-hidden="true">$</span><input id="mov-costo" name="costo" type="number" inputmode="decimal" min="0" step="0.01" aria-describedby="ayuda-mov-costo" /></div>
+        <p class="campo-ayuda" id="ayuda-mov-costo">Se guarda también como el costo actual de la pieza.</p>
+      </div>
+
+      <div class="campo">
+        <label for="mov-fecha">Fecha</label>
+        <input id="mov-fecha" name="fecha" type="date" required />
+      </div>
+
+      <div class="campo">
+        <label for="mov-nota">Descripción</label>
+        <input id="mov-nota" name="nota" maxlength="200" autocomplete="off" placeholder="Ej. pedido de proveedor, venta en colectivo" />
+      </div>
+
+      <p class="error" id="error-mov" role="alert" hidden></p>
+    </div>
+    <footer class="hoja-pie">
+      <button type="button" class="btn btn-linea" data-cerrar>Cancelar</button>
+      <button type="submit" class="btn btn-tinta" id="btn-guardar-mov">Guardar</button>
+    </footer>
+  </form>
+</dialog>
+
 <!-- CONFIRMAR ELIMINAR -->
 <dialog id="dlg-eliminar" class="alerta" aria-labelledby="titulo-eliminar" aria-describedby="texto-eliminar">
   <h2 id="titulo-eliminar">¿Eliminar?</h2>
-  <p id="texto-eliminar">Se borrará <b id="eliminar-nombre"></b> y su foto. No se puede deshacer.</p>
+  <p id="texto-eliminar">Se borrará <b id="eliminar-nombre"></b><span id="eliminar-extra"> y su foto</span>. No se puede deshacer.</p>
   <p class="muted" id="eliminar-nota"></p>
   <div class="alerta-acciones">
     <button type="button" class="btn btn-linea" data-cerrar>Cancelar</button>

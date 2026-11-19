@@ -228,8 +228,9 @@ async function cargarEquipos() {
   if (!configurado) return mostrarError();
   const { data, error } = await supabase
     .from("equipos")
-    .select("id, nombre, seccion, categoria, descripcion, precio, desde, condicion, estado, foto_url")
+    .select("id, nombre, codigo, seccion, categoria, descripcion, precio, desde, condicion, estado, foto_url, en_stock")
     .neq("estado", "vendido")
+    .order("en_stock", { ascending: false })
     .order("creado_en", { ascending: false });
   if (error) {
     console.error("No se pudo cargar el catálogo", error);
