@@ -313,7 +313,8 @@ export function crearVitrina3D(contenedor, { alFallar }) {
         if (a > A) { tex.repeat.set(A / a, 1); tex.offset.set((1 - A / a) / 2, 0); }
         else { tex.repeat.set(1, a / A); tex.offset.set(0, (1 - a / A) / 2); }
         tex.needsUpdate = true;
-        const mat = new THREE.MeshStandardMaterial({ map: tex, roughness: 0.6, emissive: 0xffffff, emissiveMap: tex, emissiveIntensity: 0.22 });
+        // Material sin luz ni tono de escena: la foto se ve con sus colores y nitidez reales (antes se lavaba y oscurecía)
+        const mat = new THREE.MeshBasicMaterial({ map: tex, toneMapped: false });
         desechables.push(mat, tex);
         cara.material = mat;
         marcar();
