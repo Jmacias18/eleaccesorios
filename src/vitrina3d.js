@@ -21,7 +21,6 @@ import "./styles/vitrina3d.css";
 
 // ---------- Medidas del mueble (unidades = metros aproximados) ----------
 const HUECO = 0.36;        // ancho de cada lugar en la repisa
-const ALTO_PIEZA = 0.33;    // alto máximo de un soporte
 // El alto de fila y la banda de título dependen del tamaño en pantalla de las etiquetas (ver construir)
 const CORNISA = 0.12;
 const ZOCALO = 0.16;
@@ -222,8 +221,9 @@ export function crearVitrina3D(contenedor, { alFallar }) {
   const capa = raiz.querySelector(".v3d-capa");
 
   // ----- Three.js -----
-  // En celular: sin antialias por hardware, menos píxeles y sin mapa de sombras (las sombras de contacto ya son planos)
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: alta, alpha: true, powerPreference: "high-performance" });
+  // Antialias también en celular: sin él los filos de los pilares parpadean al hacer scroll.
+  // En celular no hay mapa de sombras (las sombras de contacto ya son planos)
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: "high-performance" });
   // En celular también hasta 2x: con 1.25 las fotos se veían borrosas en pantallas de alta densidad
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -262,8 +262,8 @@ export function crearVitrina3D(contenedor, { alFallar }) {
   escena.add(foco, foco.target);
 
   // ----- Estado -----
-  const cam = { dolly: 1, alza: 0.04 };        // entrada de cámara
-  const par = { x: 0, y: 0, tx: 0, ty: 0 };     // deriva con el puntero
+  // Cámara de frente (sin inclinarse): así los filos verticales no "tiemblan" al hacer scroll
+  const cam = { dolly: 1 };
   let contenido = null;                         // grupo del mueble y piezas actuales
   let desechables = [];                         // geometrías y materiales a liberar al reconstruir
   let lugares = [];                             // { p, x, piso, grupo, sombra, boton }
@@ -271,7 +271,8 @@ export function crearVitrina3D(contenedor, { alFallar }) {
   let luces = [];                               // por nivel: { led, foco } materiales
   let piezasActuales = [];
   let cols = 0, anchoInt = 0, anchoExt = 0, altoMueble = 0;
-  let FILA = 0.46, BANDA = 0.2, tituloY = 0.14;
+  let BANDA = 0.2, tituloY = 0.14;
+  const caja3 = new THREE.Box3();
   let u = 0.002;                                // metros por píxel en el plano frontal
   let anchoPx = 0, altoEscena = 0, altoTotal = 0, cabecera = 0;
   let visible = false, sucio = true, animandoHasta = 0;
@@ -441,7 +442,7 @@ export function crearVitrina3D(contenedor, { alFallar }) {
     // Espacio para la etiqueta de precio que cuelga bajo cada repisa (en metros, según el ancho de pantalla)
     u = (anchoExt * (celular() ? 1.03 : 1.04)) / anchoPx;
     const etiqueta = (celular() ? 54 : 62) * u;
-    FILA = ALTO_PIEZA * escalaPieza() + Math.max(0.16, etiqueta + 10 * u);
+    const espacioEtiqueta = etiqueta + 16 * u;
     tituloY = etiqueta + 14 * u;
     BANDA = Math.max(0.2, tituloY + 24 * u);
     const fondoZ = (REPISA_Z1 + REPISA_Z0) / 2, prof = REPISA_Z1 - REPISA_Z0;
@@ -469,8 +470,17 @@ export function crearVitrina3D(contenedor, { alFallar }) {
       y -= BANDA;
 
       let i = 0;
-      filasDe(de.length).forEach(cuantas => {
-        const techo = y, piso = y - FILA;
+      filasDe(de.length).forEach((cuantas, f) => {
+        // Alto de la repisa = la pieza más alta de la fila + el espacio de la etiqueta que cuelga
+        // de la repisa de arriba (la primera fila del nivel ya lo tiene en la banda del título).
+        const soportes = de.slice(i, i + cuantas).map(p => {
+          const s = soporte(p);
+          s.scale.setScalar(escalaPieza());
+          s.updateMatrixWorld(true);
+          return s;
+        });
+        const altoPiezas = Math.max(...soportes.map(s => caja3.setFromObject(s).max.y));
+        const techo = y, piso = y - (altoPiezas + (f === 0 ? 26 * u : espacioEtiqueta));
         // LED bajo la repisa (o cornisa) de arriba
         contenido.add(caja(anchoInt * 0.97, 0.004, 0.012, ledMat, 0, techo - 0.003, REPISA_Z1 - 0.035));
         // Repisa de cristal grueso con canto verdoso y perfil de latón
@@ -482,11 +492,9 @@ export function crearVitrina3D(contenedor, { alFallar }) {
         for (let k = 0; k < cuantas; k++) {
           const p = de[i++];
           const x = (k - (cuantas - 1) / 2) * HUECO;
-          // El grupo exterior lo animan la entrada y el resaltado (escala 1); el soporte lleva la escala de celular
+          // El grupo exterior lo anima el resaltado (escala 1); el soporte lleva la escala de celular
           const grupo = new THREE.Group();
-          const sop = soporte(p);
-          sop.scale.setScalar(escalaPieza());
-          grupo.add(sop);
+          grupo.add(soportes[k]);
           grupo.position.set(x, piso, PIEZA_Z);
           contenido.add(grupo);
 
@@ -596,8 +604,8 @@ export function crearVitrina3D(contenedor, { alFallar }) {
     const visH = altoEscena * u;
     const distancia = visH / 2 / Math.tan(THREE.MathUtils.degToRad(FOV / 2));
     const cy = MARGEN - (desplazado + altoEscena / 2) * u;
-    camara.position.set(par.x, cy + cam.alza + par.y, FRENTE_Z + distancia * cam.dolly);
-    camara.lookAt(par.x * 0.3, cy, FRENTE_Z);
+    camara.position.set(0, cy, FRENTE_Z + distancia * cam.dolly);
+    camara.lookAt(0, cy, FRENTE_Z);
 
     // Sombra: el encuadre de la luz sigue a la cámara, alineado a su malla de texels para que no "tiemble"
     const texel = (sol.shadow.camera.top - sol.shadow.camera.bottom) / sol.shadow.mapSize.y;
@@ -635,10 +643,7 @@ export function crearVitrina3D(contenedor, { alFallar }) {
   function cuadro() {
     if (!visible || perdido || !contenido) return;
     const ahora = performance.now();
-    par.x += (par.tx - par.x) * 0.08;
-    par.y += (par.ty - par.y) * 0.08;
-    const moviendo = Math.abs(par.tx - par.x) + Math.abs(par.ty - par.y) > 1e-4;
-    if (!sucio && !moviendo && ahora > animandoHasta) return;
+    if (!sucio && ahora > animandoHasta) return;
     sucio = false;
     actualizarCamara();
     actualizarEtiquetas();
@@ -667,15 +672,6 @@ export function crearVitrina3D(contenedor, { alFallar }) {
     const rb = boton.getBoundingClientRect(), re = escenaEl.getBoundingClientRect();
     if (rb.top >= re.top && rb.bottom <= re.bottom) return;
     scrollBy({ top: (rb.top + rb.height / 2) - (re.top + re.height / 2), behavior: reducir ? "auto" : "smooth" });
-  }
-
-  if (alta && !reducir) {
-    escenaEl.addEventListener("pointermove", e => {
-      const r = escenaEl.getBoundingClientRect();
-      par.tx = ((e.clientX - r.left) / r.width - 0.5) * 0.12;
-      par.ty = -((e.clientY - r.top) / r.height - 0.5) * 0.06;
-    });
-    escenaEl.addEventListener("pointerleave", () => { par.tx = 0; par.ty = 0; });
   }
 
   addEventListener("scroll", () => { if (visible) marcar(); }, { passive: true });
@@ -722,7 +718,7 @@ export function crearVitrina3D(contenedor, { alFallar }) {
   function mostrarFinal() {
     sol.intensity = SOL;
     escena.environmentIntensity = ENTORNO;
-    cam.dolly = 1; cam.alza = 0.04;
+    cam.dolly = 1;
     luces.forEach(l => { l.led.color.setHex(0xfff2d2); l.foco.opacity = 0.28; });
     lugares.forEach(l => {
       l.grupo.visible = true;
