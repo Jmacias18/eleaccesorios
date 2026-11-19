@@ -313,7 +313,7 @@ function usarCss(contenedor, piezas) {
 
 /**
  * Dibuja la vitrina dentro de `contenedor` con las piezas `piezas`.
- * `waLink(mensaje)` debe devolver el enlace de WhatsApp.
+ * `waLink(mensaje)` debe devolver el enlace para pedir (hoy, la página de Facebook).
  */
 export function montarVitrina(contenedor, piezas, waLink) {
   waLinkActual = waLink;
