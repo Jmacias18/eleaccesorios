@@ -275,7 +275,8 @@ export function crearVitrina3D(contenedor, { alFallar }) {
   let u = 0.002;                                // metros por píxel en el plano frontal
   let anchoPx = 0, altoEscena = 0, altoTotal = 0, cabecera = 0;
   let visible = false, sucio = true, animandoHasta = 0;
-  let entradaHecha = reducir, entradaLista = false;
+  // Sin animación de entrada: la vitrina aparece encendida y con las piezas en su lugar (carga más rápido)
+  const entradaHecha = true;
   let turno = 0;
   let perdido = false;
 
@@ -497,10 +498,6 @@ export function crearVitrina3D(contenedor, { alFallar }) {
           sombra.position.set(x, piso + 0.0012, PIEZA_Z + 0.005);
           contenido.add(sombra);
 
-          const pozo = new THREE.Mesh(G.plano, focoMat);
-          pozo.scale.set(0.42, 0.42, 1);
-          pozo.position.set(x, piso + 0.19 * escalaPieza(), FONDO_Z + 0.004);
-          contenido.add(pozo);
 
           const boton = document.createElement("button");
           boton.type = "button";
@@ -695,7 +692,7 @@ export function crearVitrina3D(contenedor, { alFallar }) {
     if (nuevas !== cols) {
       cols = nuevas;
       construir(piezasActuales);
-      if (entradaHecha) mostrarFinal();
+      mostrarFinal();
     } else {
       medir();
     }
@@ -707,10 +704,7 @@ export function crearVitrina3D(contenedor, { alFallar }) {
 
   const io = new IntersectionObserver(([e]) => {
     visible = e.isIntersecting;
-    if (visible) {
-      marcar();
-      if (entradaLista && !entradaHecha && e.intersectionRatio > 0) entrada();
-    }
+    if (visible) marcar();
   }, { threshold: [0, 0.15] });
   io.observe(raiz);
 
@@ -741,48 +735,6 @@ export function crearVitrina3D(contenedor, { alFallar }) {
     marcar();
   }
 
-  // Antes de la entrada: mueble en penumbra, piezas fuera de su soporte
-  function prepararEntrada() {
-    sol.intensity = 0;
-    escena.environmentIntensity = 0.18;
-    cam.dolly = 1.35; cam.alza = 0.28;
-    luces.forEach(l => { l.led.color.setHex(0x3a3328); l.foco.opacity = 0; });
-    lugares.forEach(l => { l.grupo.visible = false; l.sombra.material.opacity = 0; });
-    capa.style.opacity = 0;
-    entradaLista = true;
-    marcar();
-  }
-
-  function colocarPiezas(tl, inicio) {
-    lugares.forEach((l, i) => {
-      const t = inicio + i * 0.07;
-      tl.fromTo(l.grupo.position, { y: l.piso + 0.22 }, { y: l.piso, duration: 0.95, ease: "power3.out", onStart: () => { l.grupo.visible = true; } }, t)
-        .fromTo(l.grupo.rotation, { y: 0.6 }, { y: 0, duration: 1.1, ease: "power2.out" }, t)
-        .fromTo(l.grupo.scale, { x: 0.9, y: 0.9, z: 0.9 }, { x: 1, y: 1, z: 1, duration: 0.95, ease: "power3.out" }, t)
-        .fromTo(l.sombra.material, { opacity: 0 }, { opacity: 0.4, duration: 0.7 }, t + 0.35);
-    });
-    return inicio + lugares.length * 0.07 + 1.1;
-  }
-
-  // Secuencia: mueble → luces → piezas que se colocan una a una; la cámara se acerca a la vez
-  function entrada() {
-    entradaHecha = true;
-    const led = new THREE.Color(0xfff2d2);
-    const tl = gsap.timeline({ defaults: { ease: "power2.out" } });
-    tl.to(cam, { dolly: 1, alza: 0.04, duration: 2.8, ease: "power2.inOut" }, 0)
-      .to(escena, { environmentIntensity: ENTORNO, duration: 1.6 }, 0.2)
-      .to(sol, { intensity: SOL, duration: 1.4 }, 0.5);
-    luces.forEach((l, i) => {
-      const k = { t: 0 };
-      const de = l.led.color.clone();
-      tl.to(k, { t: 1, duration: 0.6, onUpdate: () => l.led.color.copy(de).lerp(led, k.t) }, 0.6 + i * 0.25)
-        .to(l.foco, { opacity: 0.28, duration: 0.9 }, 0.75 + i * 0.25);
-    });
-    const fin = colocarPiezas(tl, 1.2);
-    tl.to(capa, { opacity: 1, duration: 0.6 }, fin - 0.6);
-    extender((fin + 0.3) * 1000);
-  }
-
   // ----- API -----
   function mostrar(piezas) {
     const mio = ++turno;
@@ -794,47 +746,15 @@ export function crearVitrina3D(contenedor, { alFallar }) {
     if (!piezas.length) { limpiar(); piezasActuales = []; return; }
     if (!cols) { anchoPx = raiz.clientWidth || contenedor.clientWidth; anchoPrevio = contenedor.clientWidth; cols = calcularColumnas(); }
 
-    const reconstruir = () => {
-      if (mio !== turno) return;
-      construir(piezas);
-      if (reducir) return mostrarFinal();
-      if (!entradaHecha) {
-        prepararEntrada();
-        // Si la vitrina ya está a la vista, la entrada arranca en el siguiente cuadro
-        requestAnimationFrame(() => {
-          const r = raiz.getBoundingClientRect();
-          if (r.top < innerHeight * 0.85 && r.bottom > 0) { visible = true; entrada(); }
-        });
-        return;
-      }
-      // Cambio de filtro: luces ya encendidas; las piezas nuevas se colocan una a una
-      mostrarFinal();
-      capa.style.opacity = 0;
-      const tl = gsap.timeline();
-      const fin = colocarPiezas(tl, 0.05);
-      tl.to(capa, { opacity: 1, duration: 0.4 }, Math.min(fin - 0.4, 0.6));
-      extender((fin + 0.3) * 1000);
-    };
-
-    // Las piezas anteriores se retiran antes de acomodar las nuevas
-    if (entradaHecha && !reducir && lugares.length) {
-      const tl = gsap.timeline({ onComplete: reconstruir });
-      tl.to(capa, { opacity: 0, duration: 0.15 }, 0);
-      lugares.forEach((l, i) => {
-        tl.to(l.grupo.position, { y: l.piso + 0.06, duration: 0.22, ease: "power1.in" }, i * 0.012)
-          .to(l.grupo.scale, { x: 0.001, y: 0.001, z: 0.001, duration: 0.22, ease: "power1.in" }, i * 0.012)
-          .to(l.sombra.material, { opacity: 0, duration: 0.18 }, i * 0.012);
-      });
-      extender(tl.duration() * 1000 + 100);
-    } else {
-      reconstruir();
-    }
+    if (mio !== turno) return;
+    construir(piezas);
+    mostrarFinal();
   }
 
   // Solo en desarrollo: permite saltar la animación para revisar el estado final
   if (import.meta.env.DEV) {
     window.__vitrina3d = {
-      final: () => { gsap.globalTimeline.progress(1); entradaHecha = true; mostrarFinal(); },
+      final: () => { gsap.globalTimeline.progress(1); mostrarFinal(); },
       info: () => ({ cols, u, altoTotal, altoEscena, piezas: lugares.length, calls: renderer.info.render.calls, tris: renderer.info.render.triangles }),
     };
   }
