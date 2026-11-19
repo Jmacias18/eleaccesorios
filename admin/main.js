@@ -3,9 +3,10 @@ import { SECCIONES, CONDICIONES, subcategoriasDe, seccion, categoria, condicion,
 import * as fotos from "../src/fotos.js";
 import { icono } from "../src/iconos.js";
 import { $, aviso, kb, htmlError, setOcupado, confirmarEliminar } from "./ui.js";
-import { datos, avisarCambio, cargarMovimientos, refrescarEquipo, normalizar, entero } from "./datos.js";
+import { datos, avisarCambio, cargarMovimientos, cargarUbicaciones, refrescarEquipo, normalizar, entero } from "./datos.js";
 import { abrirMovimiento } from "./inventario.js";
 import "./dashboard.js";
+import "./colectivos.js";
 
 // <span data-ico="nombre"> → SVG
 document.querySelectorAll("[data-ico]").forEach(el => (el.outerHTML = icono(el.dataset.ico, `ico ${el.className}`.trim())));
@@ -23,8 +24,8 @@ function mostrar(nombre) {
   Object.entries(vistas).forEach(([k, el]) => (el.hidden = k !== nombre));
 }
 
-// Pestañas del panel: #piezas, #inventario, #movimientos, #dashboard
-const VISTAS_PANEL = ["piezas", "inventario", "movimientos", "dashboard"];
+// Pestañas del panel: #piezas, #inventario, #colectivos, #movimientos, #dashboard
+const VISTAS_PANEL = ["piezas", "inventario", "colectivos", "movimientos", "dashboard"];
 function mostrarPestana() {
   const actual = VISTAS_PANEL.includes(location.hash.slice(1)) ? location.hash.slice(1) : "piezas";
   VISTAS_PANEL.forEach(v => ($("vista-" + v).hidden = v !== actual));
@@ -68,6 +69,8 @@ async function entrarAlPanel(session) {
   mostrar("panel");
   mostrarPestana();
   cargarEquipos();
+  // Sin supabase/ubicaciones.sql el panel sigue funcionando, solo sin colectivos
+  cargarUbicaciones().catch(err => console.warn("Ubicaciones no disponibles:", err.message));
   cargarMovimientos().catch(err => {
     console.error(err);
     aviso("No se pudieron cargar los movimientos. ¿Ya corriste supabase/inventario.sql?", true);

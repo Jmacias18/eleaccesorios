@@ -143,7 +143,8 @@
         </div>
         <div class="contact-item contact-direcciones" data-revelar style="--i:4">
           <svg class="ico" aria-hidden="true"><use href="#i-pin"/></svg><small>Direcciones</small>
-          <ul class="direcciones">
+          <!-- Respaldo: se reemplaza con los colectivos activos de Supabase (ubicaciones) al cargar -->
+          <ul class="direcciones" id="direcciones">
             <li><strong>Koy Colectivo</strong><span>Callejón Ley de Alfabetización, entre calles 12 y 13</span></li>
             <li><strong>Mini Colectivo Melisa Rivera</strong><span>Entre Callejón Zacatecas y Av. Quintana Roo, calle 34</span></li>
             <li><strong>Esmeralda Colectivo</strong><span>Av. 20 de Noviembre y calle 22</span></li>
@@ -198,7 +199,7 @@
 <script type="module">
 import { supabase, configurado } from "/src/supabase.js";
 import { SECCIONES, subcategoriasDe, esc } from "/src/catalogo.js";
-import { montarVitrina } from "/src/vitrina.js";
+import { montarVitrina, setUbicaciones } from "/src/vitrina.js";
 import "/src/styles/vitrina.css";
 
 /* ==========================================================
@@ -228,7 +229,7 @@ async function cargarEquipos() {
   if (!configurado) return mostrarError();
   const { data, error } = await supabase
     .from("equipos")
-    .select("id, nombre, codigo, seccion, categoria, descripcion, precio, desde, condicion, estado, foto_url, en_stock")
+    .select("id, nombre, codigo, seccion, categoria, descripcion, precio, desde, condicion, estado, foto_url, en_stock, disponible_en")
     .neq("estado", "vendido")
     .order("en_stock", { ascending: false })
     .order("creado_en", { ascending: false });
@@ -236,8 +237,21 @@ async function cargarEquipos() {
     console.error("No se pudo cargar el catálogo", error);
     return mostrarError();
   }
+  // Colectivos (nombre y dirección) para "Encuéntrala en …"; si fallan, la tienda sigue sin ese dato
+  const { data: todas } = await supabase.from("ubicaciones").select("id, nombre, direccion, tipo, publica, activa").order("orden");
+  const ubic = Array.isArray(todas) ? todas.filter(u => u.publica && u.activa && u.tipo !== "casa") : null;
+  setUbicaciones(ubic);
+  pintarDirecciones(ubic);
   EQUIPOS = data;
   renderProducts();
+}
+
+// Tarjeta "Direcciones": los colectivos activos que se muestran en la tienda (los edita el dueño en el panel)
+function pintarDirecciones(ubic) {
+  if (!Array.isArray(ubic)) return; // sin respuesta: se quedan las direcciones escritas en la página
+  const lista = document.getElementById("direcciones");
+  lista.closest(".contact-direcciones").style.display = ubic.length ? "" : "none";
+  lista.innerHTML = ubic.map(u => `<li><strong>${esc(u.nombre)}</strong>${u.direccion ? `<span>${esc(u.direccion)}</span>` : ""}</li>`).join("");
 }
 
 function mostrarError() {

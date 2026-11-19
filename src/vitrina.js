@@ -67,6 +67,19 @@ const nivelDe = p => NIVELES.find(n => n.categorias.includes(p.categoria)) || NI
 const precioTexto = p => p.precio == null ? "Consultar precio" : (p.desde ? "desde " : "") + money(p.precio);
 // La tienda solo dice si hay o no (nunca la cantidad). en_stock viene de la existencia del inventario.
 const agotado = p => p.en_stock === false;
+
+// Colectivos donde se puede encontrar la pieza (la tienda nunca ve cantidades, solo dónde hay)
+let UBICACIONES = new Map();
+export function setUbicaciones(lista) { UBICACIONES = new Map((lista || []).map(u => [u.id, u])); }
+const dondeHay = p => (p.disponible_en || []).map(id => UBICACIONES.get(id)).filter(Boolean);
+const dondeHtml = p => {
+  const lugares = agotado(p) ? [] : dondeHay(p);
+  if (!lugares.length) return "";
+  return `<div class="detalle-donde">
+        <span class="micro">Encuéntrala en</span>
+        <ul>${lugares.map(u => `<li><strong>${esc(u.nombre)}</strong>${u.direccion ? `<span>${esc(u.direccion)}</span>` : ""}</li>`).join("")}</ul>
+      </div>`;
+};
 const disponibilidad = p => agotado(p) ? "No disponible" : "En stock";
 
 // Soporte de exhibición (sin foto). Solo forma y material; no es un icono de producto.
@@ -136,6 +149,7 @@ function abrirDetalle(p) {
         ${cond ? `<span>${esc(cond)}</span>` : ""}
       </p>
       ${p.descripcion ? `<p class="detalle-desc">${esc(p.descripcion)}</p>` : ""}
+      ${dondeHtml(p)}
       <div class="detalle-acciones">
         <a class="btn btn-tinta" href="${esc(FACEBOOK_URL)}" target="_blank" rel="noopener">Pedir por Facebook</a>
         <p class="detalle-nota">Escribe ${p.codigo ? "el código" : "el nombre"} de la pieza y te confirmamos la disponibilidad por Facebook.</p>

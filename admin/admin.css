@@ -44,6 +44,9 @@ a { color: inherit; text-decoration: none; }
 button, input, select, textarea { font: inherit; color: inherit; }
 ::selection { background: var(--tinta); color: #fff; }
 :focus-visible { outline: 1px solid var(--acento); outline-offset: 3px; }
+/* Íconos: tamaño base (los contenedores que necesitan otro lo ajustan) */
+.ico { width: 18px; height: 18px; flex-shrink: 0; }
+.campo-error .ico, .error .ico { width: 16px; height: 16px; margin-top: 2px; }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .muted { color: var(--texto-suave); }
 .btn-bloque { width: 100%; }
@@ -564,3 +567,51 @@ body[data-vista="movimientos"] .contenedor { max-width: 1200px; }
 .clase-volumen { background: var(--crema-2); }
 .clase-revisar { color: var(--apartado); border-color: rgba(143, 74, 30, 0.35); }
 .clase-sin-ventas, .clase-sin-costo { color: var(--texto-tenue); }
+
+/* ==========================================================
+   Ubicaciones y colectivos
+   ========================================================== */
+.inv-acciones.con-llevar { grid-template-columns: repeat(3, 1fr); }
+.inv-acciones .btn-sm { padding-inline: 8px; }
+.inv-desc small.inv-reparto { color: var(--laton-oscuro); }
+@media (min-width: 760px) {
+  .inv-cabecera, .inv-fila { grid-template-columns: 96px minmax(0, 1fr) 100px 160px 280px; }
+}
+
+/* Selector Alta / Baja / Llevar: tantas columnas como opciones visibles */
+.segmentado { grid-template-columns: none; grid-auto-flow: column; grid-auto-columns: 1fr; }
+
+.precio-input.sufijo input { padding-left: 14px !important; padding-right: 34px; }
+.precio-input.sufijo > span { left: auto; right: 14px; }
+
+.dash-selects { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; max-width: 780px; }
+@media (max-width: 520px) { .dash-selects { grid-template-columns: 1fr 1fr; } }
+@media (min-width: 1000px) { .kpis { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.grafica-ancha { grid-column: 1 / -1; }
+.barra-h-nombre small { margin-left: 6px; font-size: 11px; color: var(--texto-tenue); }
+
+.colectivos { display: grid; gap: 14px; margin-top: 22px; }
+@media (min-width: 900px) { .colectivos { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; } }
+.col-tarjeta {
+  display: grid; gap: 16px; padding: 18px; min-width: 0;
+  background: var(--blanco); border: 1px solid var(--linea); border-radius: 16px; box-shadow: var(--sombra-1);
+}
+.col-tarjeta.inactiva { opacity: 0.6; }
+.col-cab { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.col-cab h2 { font-size: 16px; font-weight: 400; letter-spacing: 0.12em; text-transform: uppercase; }
+.col-cab .muted { font-size: 12px; margin-top: 4px; }
+.col-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.col-chips span { padding: 3px 10px; border-radius: 999px; font-size: 11px; background: var(--crema-2); border: 1px solid var(--linea); color: var(--texto-suave); }
+.col-datos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 0; }
+@media (min-width: 520px) { .col-datos { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.col-datos div { min-width: 0; }
+.col-datos dt { font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--texto-suave); }
+.col-datos dd { margin: 2px 0 0; font-size: 18px; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.col-datos dd.sub { font-size: 11px; color: var(--texto-tenue); }
+.col-acciones { display: flex; flex-wrap: wrap; gap: 8px; }
+.col-piezas summary { cursor: pointer; font-size: 12px; letter-spacing: 0.08em; color: var(--laton-oscuro); min-height: 36px; display: flex; align-items: center; }
+.col-piezas ul { list-style: none; margin-top: 6px; border-top: 1px solid var(--linea); }
+.col-piezas li { display: grid; grid-template-columns: 64px minmax(0, 1fr) auto; gap: 10px; align-items: baseline; padding: 8px 0; border-bottom: 1px solid var(--linea); font-size: 13px; }
+.col-piezas li small { color: var(--texto-tenue); font-size: 11px; }
+.col-piezas li b { font-weight: 400; font-variant-numeric: tabular-nums; }
+.col-vacio { font-size: 12px; }

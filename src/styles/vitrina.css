@@ -336,6 +336,12 @@ dialog.detalle[open]::backdrop { animation: detalle-velo 300ms ease; }
 .detalle-chip.agotado { background: #f6e9df; color: #8f4a1e; }
 .detalle-desc { margin: 0; font-size: 14px; line-height: 1.7; color: #4a4339; }
 .detalle-codigo { margin: -6px 0 0; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: #8a7a5e; }
+.detalle-donde { display: grid; gap: 8px; padding: 14px 16px; border-radius: 12px; background: #f8f3ea; }
+.detalle-donde .micro { font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: #655d50; }
+.detalle-donde ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.detalle-donde li { display: grid; gap: 2px; font-size: 13px; }
+.detalle-donde strong { font-weight: 500; color: #3b3126; }
+.detalle-donde span { font-size: 12px; color: #655d50; }
 .detalle-acciones { margin-top: auto; padding-top: 12px; display: grid; gap: 10px; }
 .detalle-acciones .btn { width: 100%; }
 .detalle-nota { margin: 0; font-size: 12px; line-height: 1.5; color: #655d50; text-align: center; }

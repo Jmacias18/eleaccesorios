@@ -54,6 +54,7 @@
     <div class="pestanas-in">
       <a href="#piezas" class="pestana" data-vista="piezas">Piezas</a>
       <a href="#inventario" class="pestana" data-vista="inventario">Inventario</a>
+      <a href="#colectivos" class="pestana" data-vista="colectivos">Colectivos</a>
       <a href="#movimientos" class="pestana" data-vista="movimientos">Movimientos</a>
       <a href="#dashboard" class="pestana" data-vista="dashboard">Dashboard</a>
     </div>
@@ -103,10 +104,28 @@
           <input type="search" id="inv-buscar" placeholder="Buscar por código o nombre" autocomplete="off" enterkeyhint="search" />
         </label>
         <div class="filtros" id="inv-secciones" role="group" aria-label="Sección"></div>
+        <div class="filtros" id="inv-ubicaciones" role="group" aria-label="Ubicación" hidden></div>
         <div class="filtros" id="inv-filtros" role="group" aria-label="Existencia"></div>
       </div>
       <div id="inv-lista"></div>
       <div class="vacio" id="inv-vacio" hidden><strong>Sin productos</strong><p class="muted">No hay productos con estos filtros.</p></div>
+    </section>
+
+    <!-- COLECTIVOS -->
+    <section id="vista-colectivos" class="vista" aria-labelledby="titulo-colectivos" hidden>
+      <div class="encabezado">
+        <div>
+          <span class="eyebrow">Inventario</span>
+          <h1 id="titulo-colectivos">Colectivos</h1>
+          <p class="muted" id="col-resumen" aria-live="polite"></p>
+        </div>
+        <button type="button" class="btn btn-linea" id="col-nuevo">Agregar ubicación</button>
+      </div>
+      <div class="herramientas">
+        <div class="filtros" id="col-periodos" role="group" aria-label="Periodo de ventas"></div>
+      </div>
+      <div class="colectivos" id="col-lista"></div>
+      <p class="vacio" id="col-falta" hidden>Para usar ubicaciones corre <code>supabase/ubicaciones.sql</code> en Supabase.</p>
     </section>
 
     <!-- MOVIMIENTOS -->
@@ -131,6 +150,7 @@
         </div>
         <div class="filtros" id="mov-tipos" role="group" aria-label="Tipo"></div>
         <div class="filtros" id="mov-secciones" role="group" aria-label="Sección"></div>
+        <div class="filtros" id="mov-ubicaciones" role="group" aria-label="Ubicación" hidden></div>
       </div>
       <ul class="lista movs" id="mov-lista"></ul>
       <div class="vacio" id="mov-vacio" hidden><strong>Sin movimientos</strong><p class="muted">Las altas y bajas que registres aparecerán aquí.</p></div>
@@ -151,14 +171,19 @@
           <label class="campo"><span>Desde</span><input type="date" id="dash-desde" /></label>
           <label class="campo"><span>Hasta</span><input type="date" id="dash-hasta" /></label>
         </div>
-        <div class="fila-2 dash-selects">
+        <div class="dash-selects">
           <label class="campo"><span>Sección</span><select id="dash-seccion"></select></label>
           <label class="campo"><span>Categoría</span><select id="dash-categoria"></select></label>
+          <label class="campo" id="dash-campo-ubicacion" hidden><span>Ubicación</span><select id="dash-ubicacion"></select></label>
         </div>
       </div>
       <p class="nota-aviso" id="dash-sin-costo" hidden></p>
       <div class="kpis" id="dash-kpis"></div>
       <div class="graficas">
+        <figure class="grafica grafica-ancha" id="dash-fig-ubic" hidden>
+          <figcaption><strong>Por ubicación</strong><span class="muted">Lo que deja cada colectivo después de comisión y renta</span></figcaption>
+          <div class="grafica-cuerpo" id="dash-ubicaciones"></div>
+        </figure>
         <figure class="grafica">
           <figcaption><strong>Ventas</strong><span class="muted" id="dash-serie-sub"></span></figcaption>
           <div class="grafica-cuerpo" id="dash-serie"></div>
@@ -302,8 +327,9 @@
     </header>
     <div class="hoja-cuerpo">
       <div class="segmentado" role="radiogroup" aria-label="Tipo de movimiento">
-        <label><input type="radio" name="tipo" value="alta" checked /><span>Alta · entra</span></label>
-        <label><input type="radio" name="tipo" value="baja" /><span>Baja · sale</span></label>
+        <label><input type="radio" name="tipo" value="alta" checked /><span>Alta</span></label>
+        <label><input type="radio" name="tipo" value="baja" /><span>Baja</span></label>
+        <label id="mov-opcion-traspaso" hidden><input type="radio" name="tipo" value="traspaso" /><span>Llevar</span></label>
       </div>
 
       <div class="campo">
@@ -312,8 +338,19 @@
         <p class="campo-ayuda" id="mov-existencia"></p>
       </div>
 
-      <div class="fila-2">
+      <div class="fila-2" id="mov-dlg-ubicaciones" hidden>
         <div class="campo">
+          <label for="mov-ubicacion" id="mov-ubicacion-label">Ubicación</label>
+          <select id="mov-ubicacion" name="ubicacion"></select>
+        </div>
+        <div class="campo" id="mov-campo-destino">
+          <label for="mov-destino">Hacia</label>
+          <select id="mov-destino" name="destino"></select>
+        </div>
+      </div>
+
+      <div class="fila-2">
+        <div class="campo" id="mov-campo-motivo">
           <label for="mov-motivo">Motivo</label>
           <select id="mov-motivo" name="motivo"></select>
         </div>
@@ -351,6 +388,45 @@
     <footer class="hoja-pie">
       <button type="button" class="btn btn-linea" data-cerrar>Cancelar</button>
       <button type="submit" class="btn btn-tinta" id="btn-guardar-mov">Guardar</button>
+    </footer>
+  </form>
+</dialog>
+
+<!-- UBICACIÓN / COLECTIVO -->
+<dialog id="dlg-ubic" class="hoja" aria-labelledby="titulo-ubic">
+  <form id="form-ubic" novalidate>
+    <header class="hoja-cabecera">
+      <h2 id="titulo-ubic">Ubicación</h2>
+      <button type="button" class="cerrar" data-cerrar aria-label="Cerrar sin guardar">×</button>
+    </header>
+    <div class="hoja-cuerpo">
+      <div class="campo">
+        <label for="u-nombre">Nombre <abbr title="obligatorio">*</abbr></label>
+        <input id="u-nombre" name="nombre" maxlength="80" autocomplete="off" required aria-describedby="err-u-nombre" />
+        <p class="campo-error" id="err-u-nombre" hidden></p>
+      </div>
+      <div class="campo">
+        <label for="u-direccion">Dirección</label>
+        <input id="u-direccion" name="direccion" maxlength="160" autocomplete="off" placeholder="Calle, entre calles" />
+      </div>
+      <div class="fila-2" id="u-cobros">
+        <div class="campo">
+          <label for="u-comision">Comisión por venta</label>
+          <div class="precio-input sufijo"><input id="u-comision" name="comision_pct" type="number" inputmode="decimal" min="0" max="100" step="0.5" placeholder="0" /><span aria-hidden="true">%</span></div>
+        </div>
+        <div class="campo">
+          <label for="u-renta">Renta mensual</label>
+          <div class="precio-input"><span aria-hidden="true">$</span><input id="u-renta" name="renta_mensual" type="number" inputmode="decimal" min="0" step="1" placeholder="0" /></div>
+        </div>
+      </div>
+      <p class="campo-ayuda" id="u-ayuda-cobros">Si no cobra, déjalo en 0. La comisión se descuenta de cada venta hecha aquí; la renta se reparte por día en el dashboard.</p>
+      <label class="check"><input type="checkbox" name="publica" /> <span>Mostrar en la tienda: <b>“Encuéntrala en …”</b> con la dirección</span></label>
+      <label class="check"><input type="checkbox" name="activa" /> <span>Activa (si ya no dejas mercancía aquí, desactívala; su historial se conserva)</span></label>
+      <p class="error" id="error-ubic" role="alert" hidden></p>
+    </div>
+    <footer class="hoja-pie">
+      <button type="button" class="btn btn-linea" data-cerrar>Cancelar</button>
+      <button type="submit" class="btn btn-tinta" id="btn-guardar-ubic">Guardar</button>
     </footer>
   </form>
 </dialog>

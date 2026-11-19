@@ -6,6 +6,8 @@ export const datos = {
   equipos: [],
   movimientos: [],
   movimientosCargados: false,
+  ubicaciones: [],      // Casa + colectivos (todas, también inactivas)
+  existencias: [],      // { equipo_id, ubicacion_id, cantidad }
   // main.js lo reemplaza: actualiza una pieza en su lista y vuelve a pintar
   reemplazarEquipo: () => {},
 };
@@ -27,11 +29,40 @@ export async function cargarMovimientos() {
   avisarCambio();
 }
 
-// Vuelve a leer una pieza (su existencia la cambia la base al registrar movimientos)
-export async function refrescarEquipo(id) {
-  const { data, error } = await supabase.from("equipos").select("*").eq("id", id).single();
-  if (!error && data) datos.reemplazarEquipo(data);
+export async function cargarUbicaciones() {
+  const [u, x] = await Promise.all([
+    supabase.from("ubicaciones").select("*").order("orden").order("creado_en"),
+    supabase.from("existencias").select("*"),
+  ]);
+  if (u.error) throw u.error;
+  if (x.error) throw x.error;
+  datos.ubicaciones = u.data;
+  datos.existencias = x.data;
+  avisarCambio();
 }
+
+// Vuelve a leer una pieza y sus existencias (las cambia la base al registrar movimientos)
+export async function refrescarEquipo(id) {
+  const [e, x] = await Promise.all([
+    supabase.from("equipos").select("*").eq("id", id).single(),
+    supabase.from("existencias").select("*").eq("equipo_id", id),
+  ]);
+  if (!x.error && x.data) datos.existencias = [...datos.existencias.filter(r => r.equipo_id !== id), ...x.data];
+  if (!e.error && e.data) datos.reemplazarEquipo(e.data);
+  else avisarCambio();
+}
+
+/* ---------- Ubicaciones ---------- */
+export const ubicacion = id => datos.ubicaciones.find(u => u.id === id);
+export const ubicacionesActivas = () => datos.ubicaciones.filter(u => u.activa);
+export const hayUbicaciones = () => datos.ubicaciones.length > 0;
+export const cantidadEn = (equipoId, ubicId) =>
+  datos.existencias.find(r => r.equipo_id === equipoId && r.ubicacion_id === ubicId)?.cantidad || 0;
+// [{ u, n }] de una pieza, solo donde hay
+export const repartoDe = equipoId => ubicacionesActivas()
+  .map(u => ({ u, n: cantidadEn(equipoId, u.id) }))
+  .filter(r => r.n > 0);
+export const casaId = () => datos.ubicaciones.find(u => u.tipo === "casa")?.id;
 
 /* ---------- Utilidades de fechas y formato ---------- */
 export const hoyISO = () => {
@@ -65,6 +96,9 @@ export const MOTIVOS = {
     { id: "venta", label: "Venta" },
     { id: "merma", label: "Merma / dañada / perdida" },
     { id: "ajuste", label: "Ajuste (conteo)" },
+  ],
+  traspaso: [
+    { id: "traspaso", label: "Traspaso" },
   ],
 };
 export const motivoLabel = (tipo, id) => MOTIVOS[tipo]?.find(m => m.id === id)?.label.split(" /")[0].split(" (")[0] || id;

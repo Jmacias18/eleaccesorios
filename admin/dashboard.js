@@ -1,13 +1,15 @@
 // Dashboard: qué tan vendible y rentable es cada producto, a partir de los movimientos.
-// Ventas = bajas con motivo "venta" (precio cobrado × cantidad). Utilidad = ventas − costo de lo vendido.
+// Ventas = bajas con motivo "venta" (precio cobrado × cantidad).
+// Utilidad bruta = ventas − costo de lo vendido − comisión del colectivo. Neta = bruta − renta de los colectivos.
 import { SECCIONES, subcategoriasDe, seccion, categoria, esc } from "../src/catalogo.js";
 import { $ } from "./ui.js";
 import {
   datos, alCambiar, PERIODOS, rangoDe, enRango, sumarDias, diasEntre, hoyISO,
-  fecha, fechaCorta, pesos, entero,
+  fecha, fechaCorta, pesos, entero, hayUbicaciones,
 } from "./datos.js";
 
-const est = { periodo: "90", seccion: "todas", categoria: "todas", clase: "todas", orden: "ventas", desc: true };
+const est = { periodo: "90", seccion: "todas", categoria: "todas", ubicacion: "todas", clase: "todas", orden: "ventas", desc: true };
+const DIAS_MES = 30.4;
 
 const CLASES = [
   { id: "estrella", label: "Estrella" },
@@ -37,14 +39,26 @@ function llenarSelects() {
   if (!subs.some(c => c.id === est.categoria)) est.categoria = "todas";
   cat.innerHTML = `<option value="todas">Todas</option>` + subs.map(c => `<option value="${c.id}">${esc(c.label)}</option>`).join("");
   cat.value = est.categoria;
+
+  $("dash-campo-ubicacion").hidden = !hayUbicaciones();
+  if (hayUbicaciones()) {
+    if (!datos.ubicaciones.some(u => u.id === est.ubicacion)) est.ubicacion = "todas";
+    $("dash-ubicacion").innerHTML = `<option value="todas">Todas</option>` +
+      datos.ubicaciones.map(u => `<option value="${u.id}">${esc(u.nombre)}${u.activa ? "" : " (inactiva)"}</option>`).join("");
+    $("dash-ubicacion").value = est.ubicacion;
+  }
 }
 
 const pasaFiltro = x => (est.seccion === "todas" || x.seccion === est.seccion) && (est.categoria === "todas" || x.categoria === est.categoria);
+const pasaUbic = m => est.ubicacion === "todas" || m.ubicacion_id === est.ubicacion;
+// La renta es por colectivo, no por producto: solo se cuenta sin filtro de sección/categoría
+const rentaAplica = () => est.seccion === "todas" && est.categoria === "todas";
+const rentaDe = (u, dias) => (u.activa ? Number(u.renta_mensual || 0) * dias / DIAS_MES : 0);
 
 /* ---------- Cálculo ---------- */
 function calcular() {
   const hoy = hoyISO();
-  const movs = datos.movimientos.filter(pasaFiltro);
+  const movs = datos.movimientos.filter(m => pasaFiltro(m) && pasaUbic(m));
   let [desde, hasta] = rangoDe(est.periodo, $("dash-desde").value, $("dash-hasta").value);
   if (!desde) desde = datos.movimientos.reduce((min, m) => (m.fecha < min ? m.fecha : min), hoy);
   const dias = Math.max(1, diasEntre(desde, hasta) + 1);
@@ -57,7 +71,7 @@ function calcular() {
   datos.equipos.filter(pasaFiltro).forEach(e => productos.set(e.id, nuevo(e.id, e)));
 
   let ventasAnt = 0;
-  const totales = { ventas: 0, piezas: 0, costoVendido: 0, ventasConCosto: 0, lineasSinCosto: 0, merma: 0, mermaCosto: 0 };
+  const totales = { ventas: 0, piezas: 0, costoVendido: 0, ventasConCosto: 0, comisionConCosto: 0, comision: 0, lineasSinCosto: 0, merma: 0, mermaCosto: 0 };
 
   for (const m of movs) {
     const eq = porId.get(m.equipo_id);
@@ -72,15 +86,20 @@ function calcular() {
 
     if (m.motivo === "venta") {
       const imp = m.cantidad * precio;
+      const com = m.cantidad * (m.comision_unitaria || 0);
       p.vendidas += m.cantidad;
       p.ventas += imp;
+      p.comision += com;
       totales.ventas += imp;
       totales.piezas += m.cantidad;
+      totales.comision += com;
       if (costo != null) {
         p.costoVendido += m.cantidad * costo;
         p.ventasConCosto += imp;
+        p.comisionConCosto += com;
         totales.costoVendido += m.cantidad * costo;
         totales.ventasConCosto += imp;
+        totales.comisionConCosto += com;
       } else {
         p.sinCosto = true;
         totales.lineasSinCosto++;
@@ -96,8 +115,12 @@ function calcular() {
   }
 
   const lista = [...productos.values()];
+  if (est.ubicacion !== "todas") {
+    const aqui = new Map(datos.existencias.filter(x => x.ubicacion_id === est.ubicacion).map(x => [x.equipo_id, x.cantidad]));
+    lista.forEach(p => { if (p.vivo) p.existencia = aqui.get(p.clave) || 0; });
+  }
   lista.forEach(p => {
-    p.utilidad = p.ventasConCosto ? p.ventasConCosto - p.costoVendido : null;
+    p.utilidad = p.ventasConCosto ? p.ventasConCosto - p.costoVendido - p.comisionConCosto : null;
     p.margen = p.ventasConCosto ? p.utilidad / p.ventasConCosto : null;
     // Si nunca se vendió, el margen esperado sale del precio y el costo de la pieza
     p.margenEsperado = p.precio && p.costo != null ? (p.precio - p.costo) / p.precio : null;
@@ -134,7 +157,7 @@ function nuevo(clave, e) {
     inv_minimo: e.inv_minimo ?? 0,
     precio: e.precio ?? null,
     costo: e.costo ?? null,
-    vendidas: 0, ventas: 0, costoVendido: 0, ventasConCosto: 0, merma: 0, entradas: 0,
+    vendidas: 0, ventas: 0, costoVendido: 0, ventasConCosto: 0, comision: 0, comisionConCosto: 0, merma: 0, entradas: 0,
     sinCosto: false, ultimaVenta: null,
   };
 }
@@ -167,7 +190,10 @@ function render() {
   const piezasInv = lista.filter(p => p.vivo).reduce((s, p) => s + p.existencia, 0);
   const valorVenta = lista.filter(p => p.vivo).reduce((s, p) => s + p.existencia * (p.precio || 0), 0);
   const valorCosto = lista.filter(p => p.vivo).reduce((s, p) => s + p.existencia * (p.costo || 0), 0);
-  const utilidad = t.ventasConCosto ? t.ventasConCosto - t.costoVendido : null;
+  const utilidad = t.ventasConCosto ? t.ventasConCosto - t.costoVendido - t.comisionConCosto : null;
+  const ubicRenta = datos.ubicaciones.filter(u => est.ubicacion === "todas" || u.id === est.ubicacion);
+  const renta = rentaAplica() ? ubicRenta.reduce((s, u) => s + rentaDe(u, r.dias), 0) : 0;
+  const neta = utilidad == null ? null : utilidad - renta;
   const margen = t.ventasConCosto ? utilidad / t.ventasConCosto : null;
   const cambio = est.periodo !== "todo" && r.ventasAnt > 0 ? (t.ventas - r.ventasAnt) / r.ventasAnt : null;
   const resurtir = lista.filter(p => p.resurtir).length;
@@ -180,7 +206,14 @@ function render() {
       `${entero(t.piezas)} pieza${t.piezas === 1 ? "" : "s"}` +
       (cambio != null ? ` · ${cambio >= 0 ? "▲" : "▼"} ${pct(Math.abs(cambio))} vs. periodo anterior` : "")),
     kpi("Utilidad bruta", utilidad == null ? "—" : pesos(utilidad),
-      utilidad == null ? "Falta capturar costos" : `Margen ${pct(margen)}${t.lineasSinCosto ? " · sin contar ventas sin costo" : ""}`),
+      utilidad == null ? "Falta capturar costos"
+        : `Margen ${pct(margen)}${t.comision ? ` · ya resta ${pesos(t.comision)} de comisiones` : ""}${t.lineasSinCosto ? " · sin contar ventas sin costo" : ""}`),
+    ...(hayUbicaciones() ? [
+      kpi("Renta de colectivos", rentaAplica() ? pesos(renta) : "—",
+        rentaAplica() ? `Prorrateada a ${entero(r.dias)} días` : "No se reparte por sección o categoría"),
+      kpi("Utilidad neta", neta == null ? "—" : pesos(neta),
+        neta == null ? "Falta capturar costos" : "Ventas − costo − comisión − renta"),
+    ] : []),
     kpi("Inventario actual", `${entero(piezasInv)} piezas`, `${pesos(valorVenta)} a precio${valorCosto ? ` · ${pesos(valorCosto)} a costo` : ""}`),
     kpi("Por resurtir", entero(resurtir), "Sin stock con ventas, o en su mínimo"),
     kpi("Sin ventas", entero(quietos), "Productos con stock que no se vendieron en el periodo"),
@@ -188,13 +221,14 @@ function render() {
   ].join("");
 
   renderSerie(r);
+  renderUbicaciones(r);
   renderCategorias(lista);
   renderTabla(lista);
 }
 
 // Ventas en el tiempo: por día (≤ 31 días), por semana (≤ 6 meses) o por mes
 function renderSerie(r) {
-  const ventas = datos.movimientos.filter(m => m.motivo === "venta" && pasaFiltro(m) && enRango(m.fecha, [r.desde, r.hasta]));
+  const ventas = datos.movimientos.filter(m => m.motivo === "venta" && pasaFiltro(m) && pasaUbic(m) && enRango(m.fecha, [r.desde, r.hasta]));
   const porId = new Map(datos.equipos.map(e => [e.id, e]));
   const paso = r.dias <= 31 ? "dia" : r.dias <= 190 ? "semana" : "mes";
   const claveDe = iso => {
@@ -238,6 +272,40 @@ function renderSerie(r) {
           ${i % cada === 0 ? `<small>${esc(etiqueta(iso))}</small>` : ""}
         </span>`).join("")}
     </div>`;
+}
+
+// Por ubicación: ventas, comisión, renta y lo que deja cada colectivo
+function renderUbicaciones(r) {
+  const fig = $("dash-fig-ubic");
+  fig.hidden = !hayUbicaciones() || est.ubicacion !== "todas";
+  if (fig.hidden) return;
+  const porId = new Map(datos.equipos.map(e => [e.id, e]));
+  const filas = datos.ubicaciones.map(u => {
+    const ventas = datos.movimientos.filter(m => m.motivo === "venta" && m.ubicacion_id === u.id && pasaFiltro(m) && enRango(m.fecha, [r.desde, r.hasta]));
+    const vendido = ventas.reduce((s, m) => s + m.cantidad * (m.precio_unitario ?? porId.get(m.equipo_id)?.precio ?? 0), 0);
+    const costo = ventas.reduce((s, m) => s + m.cantidad * (m.costo_unitario ?? porId.get(m.equipo_id)?.costo ?? 0), 0);
+    const sinCosto = ventas.some(m => (m.costo_unitario ?? porId.get(m.equipo_id)?.costo) == null);
+    const comision = ventas.reduce((s, m) => s + m.cantidad * (m.comision_unitaria || 0), 0);
+    const renta = rentaAplica() ? rentaDe(u, r.dias) : 0;
+    const piezas = datos.existencias.filter(x => x.ubicacion_id === u.id).reduce((s, x) => s + x.cantidad, 0);
+    return { u, vendido, costo, sinCosto, comision, renta, neta: vendido - costo - comision - renta, piezas };
+  }).filter(f => f.vendido || f.piezas || f.renta);
+  if (!filas.length) {
+    $("dash-ubicaciones").innerHTML = `<p class="grafica-vacia">Sin ventas ni mercancía en las ubicaciones.</p>`;
+    return;
+  }
+  const max = Math.max(...filas.map(f => f.vendido), 1);
+  $("dash-ubicaciones").innerHTML = `<ul class="barras-h ubic">${filas.sort((a, b) => b.vendido - a.vendido).map(f => `
+    <li>
+      <span class="barra-h-nombre">${esc(f.u.nombre)} <small>${entero(f.piezas)} piezas ahí</small></span>
+      <span class="barra-h-pista"><i style="--w:${(f.vendido / max * 100).toFixed(1)}%"></i></span>
+      <span class="barra-h-valor">${pesos(f.vendido)}<small>${[
+        f.comision && `comisión ${pesos(f.comision)}`,
+        f.renta && `renta ${pesos(f.renta)}`,
+        `te deja ${pesos(f.neta)}${f.sinCosto ? "*" : ""}`,
+      ].filter(Boolean).join(" · ")}</small></span>
+    </li>`).join("")}</ul>
+    ${filas.some(f => f.sinCosto) ? `<p class="muted dash-ayuda">* Hay ventas de piezas sin costo capturado; lo que deja sale más alto de lo real.</p>` : ""}`;
 }
 
 function renderCategorias(lista) {
@@ -335,6 +403,7 @@ $("dash-periodos").addEventListener("click", e => {
 ["dash-desde", "dash-hasta"].forEach(id => $(id).addEventListener("input", render));
 $("dash-seccion").addEventListener("change", e => { est.seccion = e.target.value; render(); });
 $("dash-categoria").addEventListener("change", e => { est.categoria = e.target.value; render(); });
+$("dash-ubicacion").addEventListener("change", e => { est.ubicacion = e.target.value; render(); });
 $("dash-clases").addEventListener("click", e => {
   const b = e.target.closest("[data-clase]");
   if (b) { est.clase = b.dataset.clase; render(); }
