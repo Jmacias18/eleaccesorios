@@ -38,6 +38,8 @@ const reducir = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const celular = () => matchMedia("(max-width: 899px)").matches;
 const punteroFino = matchMedia("(hover: hover) and (pointer: fine)").matches;
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+// En celular los soportes (y sus fotos) se ven más grandes; 1.28 es lo máximo que cabe en el HUECO
+const escalaPieza = () => (celular() ? 1.28 : 1);
 
 // ---------- Texturas generadas (sin descargar imágenes) ----------
 function lienzo(w, h = w) {
@@ -435,7 +437,7 @@ export function crearVitrina3D(contenedor, { alFallar }) {
     // Espacio para la etiqueta de precio que cuelga bajo cada repisa (en metros, según el ancho de pantalla)
     u = (anchoExt * (celular() ? 1.03 : 1.04)) / anchoPx;
     const etiqueta = (celular() ? 54 : 62) * u;
-    FILA = ALTO_PIEZA + Math.max(0.16, etiqueta + 10 * u);
+    FILA = ALTO_PIEZA * escalaPieza() + Math.max(0.16, etiqueta + 10 * u);
     tituloY = etiqueta + 14 * u;
     BANDA = Math.max(0.2, tituloY + 24 * u);
     const fondoZ = (REPISA_Z1 + REPISA_Z0) / 2, prof = REPISA_Z1 - REPISA_Z0;
@@ -476,7 +478,11 @@ export function crearVitrina3D(contenedor, { alFallar }) {
         for (let k = 0; k < cuantas; k++) {
           const p = de[i++];
           const x = (k - (cuantas - 1) / 2) * HUECO;
-          const grupo = soporte(p);
+          // El grupo exterior lo animan la entrada y el resaltado (escala 1); el soporte lleva la escala de celular
+          const grupo = new THREE.Group();
+          const sop = soporte(p);
+          sop.scale.setScalar(escalaPieza());
+          grupo.add(sop);
           grupo.position.set(x, piso, PIEZA_Z);
           contenido.add(grupo);
 
@@ -484,13 +490,13 @@ export function crearVitrina3D(contenedor, { alFallar }) {
           desechables.push(sombraMat);
           const sombra = new THREE.Mesh(G.plano, sombraMat);
           sombra.rotation.x = -Math.PI / 2;
-          sombra.scale.set(0.3, 0.17, 1);
+          sombra.scale.set(0.3 * escalaPieza(), 0.17 * escalaPieza(), 1);
           sombra.position.set(x, piso + 0.0012, PIEZA_Z + 0.005);
           contenido.add(sombra);
 
           const pozo = new THREE.Mesh(G.plano, focoMat);
           pozo.scale.set(0.42, 0.42, 1);
-          pozo.position.set(x, piso + 0.19, FONDO_Z + 0.004);
+          pozo.position.set(x, piso + 0.19 * escalaPieza(), FONDO_Z + 0.004);
           contenido.add(pozo);
 
           const boton = document.createElement("button");
@@ -613,7 +619,7 @@ export function crearVitrina3D(contenedor, { alFallar }) {
     lugares.forEach(l => {
       const [x0] = aPantalla(l.x - ancho, l.piso, REPISA_Z1);
       const [x1, y1] = aPantalla(l.x + ancho, l.piso - VIDRIO, REPISA_Z1);
-      const [, y0] = aPantalla(l.x, l.piso + 0.3, PIEZA_Z);
+      const [, y0] = aPantalla(l.x, l.piso + 0.3 * escalaPieza(), PIEZA_Z);
       estilo(l.boton, "transform", `translate(${x0.toFixed(1)}px, ${y0.toFixed(1)}px)`);
       estilo(l.boton, "width", (x1 - x0).toFixed(1) + "px");
       estilo(l.boton, "height", (y1 - y0).toFixed(1) + "px");
