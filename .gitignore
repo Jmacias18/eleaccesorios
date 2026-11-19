@@ -18,3 +18,6 @@ CLAUDE.md
 
 # Skills de agentes instaladas localmente
 .agents/
+
+# Configuración local de herramientas (skills)
+skills-lock.json
